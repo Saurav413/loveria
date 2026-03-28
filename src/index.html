@@ -191,13 +191,17 @@
             <a href="features/timezone/index.html" class="menu-item">
                 <span>🌎</span><br>Timezone
             </a>
+            <a href="features/reminders/ReminderSetup.html" class="menu-item">
+                <span>🗓️</span><br>Reminders
+            </a>
         </div>
 
         <button class="logout-btn" onclick="logout()">Logout</button>
     </div>
 
+    <script src="utils/config.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
+        document.addEventListener('DOMContentLoaded', async () => {
             const user = JSON.parse(localStorage.getItem('user'));
 
             // 1. Check Authentication
@@ -206,24 +210,38 @@
                 return;
             }
 
-            // 2. Check Onboarding Status
-            if (!user.nickname || !user.partner_nickname) {
+            // 2. Refresh user from DB so UI always reflects saved data.
+            let dbUser = user;
+            try {
+                const response = await fetch(`${CONFIG.API_BASE_URL}/api/user/${user.id}`);
+                const data = await response.json();
+                if (response.ok && data.user) {
+                    dbUser = data.user;
+                    localStorage.setItem('user', JSON.stringify(dbUser));
+                }
+            } catch (err) {
+                // Fall back to local storage when offline/API unavailable.
+                console.warn('Could not refresh user from DB:', err);
+            }
+
+            // 3. Check onboarding status
+            if (!dbUser.nickname || !dbUser.partner_nickname) {
                 window.location.href = 'features/onboarding/Nickname.html';
                 return;
             }
 
-            if (!user.relationship_date) {
+            if (!dbUser.relationship_date) {
                 window.location.href = 'features/onboarding/DateSelection.html';
                 return;
             }
 
-            // 3. Display Data
+            // 4. Display Data
             document.getElementById('loading').style.display = 'none';
-            document.getElementById('nicknames-display').innerText = `${user.nickname} & ${user.partner_nickname}`;
+            document.getElementById('nicknames-display').innerText = `${dbUser.nickname} & ${dbUser.partner_nickname}`;
 
-            // 4. Calculate Days
+            // 5. Calculate Days
             const calcDays = () => {
-                const startDate = new Date(user.relationship_date);
+                const startDate = new Date(dbUser.relationship_date);
                 const today = new Date();
                 const diffTime = Math.abs(today - startDate);
                 const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));

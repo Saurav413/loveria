@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Set Reminder - Loveria</title>
+    <link rel="stylesheet" href="../auth/Auth.css">
+    <script src="../../utils/config.js"></script>
+    <style>
+        :root {
+            --primary: #ff4d6d;
+            --primary-light: #ff758f;
+            --bg: #fff0f3;
+            --glass: rgba(255, 255, 255, 0.85);
+        }
+
+        body {
+            background: linear-gradient(135deg, #fff0f3 0%, #ffccd5 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            background: var(--glass);
+            backdrop-filter: blur(10px);
+            width: 100%;
+            max-width: 520px;
+            padding: 28px;
+            border-radius: 22px;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 10px 30px rgba(255, 77, 109, 0.12);
+        }
+
+        h1 {
+            color: var(--primary);
+            margin: 0 0 8px;
+        }
+
+        .subtitle {
+            color: #555;
+            margin: 0 0 20px;
+            font-size: 0.95rem;
+        }
+
+        .input-group {
+            margin-bottom: 14px;
+            text-align: left;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 6px;
+            color: #333;
+            font-weight: 600;
+        }
+
+        .input-group input,
+        .input-group textarea {
+            width: 100%;
+            box-sizing: border-box;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 12px;
+            font-size: 0.95rem;
+            color: #000;
+            background: #fff;
+        }
+
+        .input-group textarea {
+            min-height: 90px;
+            resize: vertical;
+        }
+
+        .btn-row {
+            display: flex;
+            gap: 10px;
+            margin-top: 12px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 700;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: #fff;
+        }
+
+        .btn-secondary {
+            background: #f2f2f2;
+            color: #333;
+        }
+
+        .reminder-list {
+            margin-top: 22px;
+        }
+
+        .reminder-item {
+            background: #fff;
+            border: 1px solid #eee;
+            border-radius: 12px;
+            padding: 12px;
+            margin-bottom: 10px;
+        }
+
+        .date {
+            color: var(--primary);
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .note {
+            color: #333;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Mark a Special Date</h1>
+        <p class="subtitle">Pick a date, add a note, and we will notify you on that day.</p>
+
+        <form id="reminder-form">
+            <div class="input-group">
+                <label for="reminderDate">Date</label>
+                <input type="date" id="reminderDate" required>
+            </div>
+            <div class="input-group">
+                <label for="note">Note</label>
+                <textarea id="note" placeholder="Anniversary dinner at 8 PM 💕" required></textarea>
+            </div>
+            <div class="btn-row">
+                <button class="btn btn-primary" type="submit">Save Reminder</button>
+                <button class="btn btn-secondary" type="button" id="continueBtn">Next: Add Couple Photo</button>
+            </div>
+        </form>
+
+        <div class="reminder-list">
+            <h3>Saved Reminders</h3>
+            <div id="remindersContainer"></div>
+        </div>
+    </div>
+
+    <script>
+        const user = JSON.parse(localStorage.getItem('user'));
+        if (!user || !user.id) {
+            window.location.href = '../auth/Login.html';
+        }
+
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('reminderDate').setAttribute('min', today);
+
+        async function fetchReminders() {
+            const response = await fetch(`${CONFIG.API_BASE_URL}/api/reminders/${user.id}`);
+            const data = await response.json();
+            return response.ok ? data.reminders : [];
+        }
+
+        async function markNotified(reminderId) {
+            await fetch(`${CONFIG.API_BASE_URL}/api/reminders/${reminderId}/notified`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' }
+            });
+        }
+
+        function renderReminders(reminders) {
+            const container = document.getElementById('remindersContainer');
+            if (!reminders.length) {
+                container.innerHTML = '<p style="color:#666">No reminders yet.</p>';
+                return;
+            }
+
+            container.innerHTML = reminders.map((r) => `
+                <div class="reminder-item">
+                    <div class="date">${r.reminder_date}</div>
+                    <div class="note">${r.note}</div>
+                </div>
+            `).join('');
+        }
+
+        async function checkDueReminders() {
+            const reminders = await fetchReminders();
+            renderReminders(reminders);
+            const now = new Date();
+            const todayDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+            for (const reminder of reminders) {
+                if (Number(reminder.is_notified) === 1) continue;
+
+                const due = new Date(reminder.reminder_date);
+                const dueDate = new Date(due.getFullYear(), due.getMonth(), due.getDate());
+                if (dueDate.getTime() !== todayDate.getTime()) continue;
+
+                if (Notification.permission === 'granted') {
+                    new Notification('Loveria Reminder', {
+                        body: reminder.note
+                    });
+                } else {
+                    alert(`Reminder: ${reminder.note}`);
+                }
+                await markNotified(reminder.id);
+            }
+        }
+
+        document.getElementById('reminder-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const reminderDate = document.getElementById('reminderDate').value;
+            const note = document.getElementById('note').value.trim();
+
+            if (!reminderDate || !note) {
+                alert('Please choose a date and add a note.');
+                return;
+            }
+
+            const response = await fetch(`${CONFIG.API_BASE_URL}/api/reminders`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    userId: user.id,
+                    reminderDate,
+                    note
+                })
+            });
+
+            const data = await response.json();
+            if (!response.ok) {
+                alert(data.error || 'Failed to save reminder.');
+                return;
+            }
+
+            alert('Reminder saved!');
+            document.getElementById('reminder-form').reset();
+            await checkDueReminders();
+        });
+
+        document.getElementById('continueBtn').addEventListener('click', () => {
+            window.location.href = '../onboarding/CouplePhoto.html';
+        });
+
+        (async function init() {
+            if ('Notification' in window && Notification.permission === 'default') {
+                await Notification.requestPermission();
+            }
+            await checkDueReminders();
+            setInterval(checkDueReminders, 60 * 1000);
+        })();
+    </script>
+</body>
+
+</html>

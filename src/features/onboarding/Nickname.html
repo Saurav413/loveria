@@ -77,7 +77,7 @@
             font-size: 0.9rem;
         }
 
-        input {
+        .input-group input {
             width: 100%;
             padding: 14px 16px;
             border: 2px solid #edeff2;
@@ -86,12 +86,17 @@
             transition: all 0.3s ease;
             box-sizing: border-box;
             background: white;
+            color: #000;
         }
 
-        input:focus {
+        .input-group input:focus {
             border-color: var(--primary-light);
             outline: none;
             box-shadow: 0 0 0 4px rgba(255, 77, 109, 0.1);
+        }
+
+        .input-group input::placeholder {
+            color: #666;
         }
 
         .save-btn {
@@ -187,9 +192,11 @@
                 const data = await response.json();
                 if (response.ok) {
                     alert('All set! Welcome to Loveria.');
-                    user.nickname = nickname;
-                    user.partner_nickname = partnerNickname;
-                    localStorage.setItem('user', JSON.stringify(user));
+                    localStorage.setItem('user', JSON.stringify(data.user || {
+                        ...user,
+                        nickname,
+                        partner_nickname: partnerNickname
+                    }));
                     // Redirect to date selection
                     window.location.href = './DateSelection.html';
                 } else {

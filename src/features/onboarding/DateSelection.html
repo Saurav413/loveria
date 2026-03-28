@@ -223,10 +223,12 @@
 
                 const data = await response.json();
                 if (response.ok) {
-                    user.relationship_date = relationshipDate;
-                    localStorage.setItem('user', JSON.stringify(user));
-                    alert('Engagement successful! Welcome to Loveria.');
-                    window.location.href = '../../index.html';
+                    localStorage.setItem('user', JSON.stringify(data.user || {
+                        ...user,
+                        relationship_date: relationshipDate
+                    }));
+                    alert('Engagement successful! Set your first reminder.');
+                    window.location.href = '../reminders/ReminderSetup.html';
                 } else {
                     alert(data.error || 'Failed to update relationship date.');
                 }
