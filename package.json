@@ -1,8 +1,12 @@
 {
   "name": "loveria",
   "version": "1.0.0",
-  "description": "## Folder Structure",
+  "description": "Express + MySQL couple app with auth, onboarding, date reminders, and optional couple photo upload; Capacitor-ready static frontend.",
   "main": "server.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Saurav413/loveria.git"
+  },
   "directories": {
     "doc": "docs",
     "test": "tests"
@@ -12,7 +16,14 @@
     "dev": "node --watch server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [],
+  "keywords": [
+    "loveria",
+    "couples",
+    "express",
+    "mysql",
+    "capacitor",
+    "nodejs"
+  ],
   "author": "",
   "license": "ISC",
   "dependencies": {
@@ -23,7 +34,6 @@
     "bcryptjs": "^3.0.3",
     "body-parser": "^2.2.2",
     "cors": "^2.8.6",
-    "dotenv": "^17.2.3",
     "dotenv": "^17.3.1",
     "express": "^5.2.1",
     "mysql2": "^3.20.0"
