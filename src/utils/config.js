@@ -1,4 +1,7 @@
+const isBrowserHttp = typeof window !== 'undefined' && /^https?:\/\//.test(window.location.origin);
+
 const CONFIG = {
-    // Replace with your server's local IP address if running on a device
-    API_BASE_URL: 'http://192.168.100.11:3000'
+    // Default to same origin for web (e.g. http://localhost:3000).
+    // Fallback keeps local dev working if loaded from non-http context.
+    API_BASE_URL: isBrowserHttp ? window.location.origin : 'http://localhost:3000'
 };

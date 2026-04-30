@@ -7,6 +7,163 @@
     <title>Login - Loveria</title>
     <link rel="stylesheet" href="Auth.css">
     <script src="../../utils/config.js"></script>
+    <script src="https://accounts.google.com/gsi/client?hl=en" async defer></script>
+    <style>
+        .otp-modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(8, 3, 20, 0.7);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            padding: 20px;
+        }
+
+        .otp-modal {
+            width: 100%;
+            max-width: 360px;
+            background: rgba(33, 12, 68, 0.95);
+            border: 1px solid rgba(255, 170, 236, 0.35);
+            border-radius: 16px;
+            padding: 20px;
+            color: #f6e8ff;
+            text-align: center;
+            box-shadow: 0 16px 34px rgba(8, 3, 20, 0.6);
+        }
+
+        .otp-modal h3 {
+            margin: 0 0 8px;
+            color: #ffe8fb;
+        }
+
+        .otp-modal p {
+            margin: 0 0 14px;
+            color: #e8d0ff;
+            font-size: 0.95rem;
+        }
+
+        .otp-input-row {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+        }
+
+        .otp-digit {
+            width: 44px;
+            height: 50px;
+            border: 1px solid rgba(255, 170, 236, 0.45);
+            background: rgba(255, 255, 255, 0.12);
+            border-radius: 10px;
+            font-size: 1.2rem;
+            text-align: center;
+            color: #fff;
+            outline: none;
+        }
+
+        .otp-digit:focus {
+            border-color: #ff79d5;
+            box-shadow: 0 0 0 2px rgba(255, 121, 213, 0.2);
+        }
+
+        .otp-modal-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 14px;
+        }
+
+        .otp-btn {
+            flex: 1;
+            border: none;
+            border-radius: 10px;
+            padding: 11px;
+            cursor: pointer;
+            font-weight: 700;
+        }
+
+        .otp-btn-primary {
+            background: linear-gradient(135deg, #ff5cc8, #8f5bff);
+            color: #fff;
+        }
+
+        .otp-btn-secondary {
+            background: rgba(255, 255, 255, 0.16);
+            color: #f3e8ff;
+        }
+
+        .google-login-shell {
+            position: relative;
+            width: 100%;
+            height: 56px;
+            padding: 0 14px;
+            border-radius: 12px;
+            overflow: hidden;
+            border: none;
+            background: linear-gradient(90deg, #f04bb2 0%, #8a5dff 100%);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            font-weight: 700;
+            box-shadow: 0 10px 24px rgba(129, 82, 255, 0.35);
+            box-sizing: border-box;
+        }
+
+        .google-login-content {
+            pointer-events: none;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .google-logo-badge {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .google-logo-badge svg {
+            width: 22px;
+            height: 22px;
+        }
+
+        #googleLoginContainer {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            z-index: 2;
+        }
+
+        .google-login-shell.disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        #googleLoginStatus {
+            margin: 0;
+            font-size: 0.86rem;
+            color: #ffd7f5;
+            min-height: 0;
+        }
+
+        #googleLoginStatus:empty {
+            display: none;
+        }
+
+        .social-btn.apple {
+            height: 56px;
+            padding: 0 14px;
+            box-sizing: border-box;
+        }
+    </style>
 </head>
 
 <body>
@@ -14,28 +171,25 @@
         <h1 onclick="window.location.href='Signup.html'" style="cursor:pointer">Loveria</h1>
         <p class="subtitle">Welcome back, connect now</p>
 
-        <form>
-            <div class="input-group">
-                <label for="email">Email Address</label>
-                <input type="email" id="email" placeholder="Enter your email" required>
-            </div>
-            <div class="input-group">
-                <label for="password">Password</label>
-                <input type="password" id="password" placeholder="Enter your password" required>
-            </div>
-            <button type="submit" class="signup-btn">Log In</button>
-        </form>
-
         <div class="divider">
-            <span>or continue with</span>
+            <span>Choose a login method</span>
         </div>
 
         <div class="social-btns">
-            <button class="social-btn google">
-                <img src="https://www.gstatic.com/images/branding/product/1x/gsa_512dp.png" alt="Google"
-                    style="width: 18px;">
-                Continue with Google
-            </button>
+            <div class="google-login-shell" id="googleLoginShell">
+                <div class="google-login-content">
+                    <span class="google-logo-badge" aria-hidden="true">
+                        <svg viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+                            <path fill="#EA4335" d="M24 9.5c3.4 0 6.4 1.2 8.8 3.2l6.6-6.6C35.4 2.4 30.1 0 24 0 14.6 0 6.4 5.4 2.4 13.3l7.7 6c1.8-5.6 7.1-9.8 13.9-9.8z"/>
+                            <path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-2.8-.4-4.1H24v7.8h12.8c-.3 2-1.8 5.1-5.1 7.2l7.6 5.9c4.4-4.1 7.2-10.2 7.2-16.8z"/>
+                            <path fill="#FBBC05" d="M10.1 28.7c-.5-1.4-.8-3-.8-4.7s.3-3.3.8-4.7l-7.7-6C.9 16.5 0 20.1 0 24c0 3.9.9 7.5 2.4 10.7l7.7-6z"/>
+                            <path fill="#34A853" d="M24 48c6.5 0 12-2.1 16-5.8l-7.6-5.9c-2 1.4-4.8 2.4-8.4 2.4-6.8 0-12.1-4.2-13.9-9.8l-7.7 6C6.4 42.6 14.6 48 24 48z"/>
+                        </svg>
+                    </span>
+                    <span>Continue with Google</span>
+                </div>
+                <div id="googleLoginContainer" aria-label="Continue with Google"></div>
+            </div>
             <button class="social-btn apple">
                 <svg width="18" height="18" viewBox="0 0 18 18" fill="white" xmlns="http://www.w3.org/2000/svg">
                     <path
@@ -44,6 +198,7 @@
                 Continue with Apple
             </button>
         </div>
+        <p id="googleLoginStatus" aria-live="polite"></p>
 
         <p class="footer-text">
             Don't have an account? <a href="Signup.html">Sign up</a><br><br>
@@ -51,36 +206,185 @@
         </p>
     </div>
 
-    <script>
-        document.querySelector('form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
+    <div id="otpModalOverlay" class="otp-modal-overlay">
+        <div class="otp-modal">
+            <h3>Email Verification</h3>
+            <p id="otpModalText"></p>
+            <div class="otp-input-row" id="otpInputRow">
+                <input type="text" class="otp-digit" maxlength="1" inputmode="numeric" aria-label="OTP digit 1">
+                <input type="text" class="otp-digit" maxlength="1" inputmode="numeric" aria-label="OTP digit 2">
+                <input type="text" class="otp-digit" maxlength="1" inputmode="numeric" aria-label="OTP digit 3">
+                <input type="text" class="otp-digit" maxlength="1" inputmode="numeric" aria-label="OTP digit 4">
+                <input type="text" class="otp-digit" maxlength="1" inputmode="numeric" aria-label="OTP digit 5">
+                <input type="text" class="otp-digit" maxlength="1" inputmode="numeric" aria-label="OTP digit 6">
+            </div>
+            <div class="otp-modal-actions">
+                <button type="button" id="otpCancelBtn" class="otp-btn otp-btn-secondary">Cancel</button>
+                <button type="button" id="otpVerifyBtn" class="otp-btn otp-btn-primary">Verify</button>
+            </div>
+        </div>
+    </div>
 
-            try {
-                const response = await fetch(`${CONFIG.API_BASE_URL}/api/login`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email, password })
+    <script>
+        function redirectAfterAuth(user) {
+            localStorage.setItem('user', JSON.stringify(user));
+            if (!user.gender) {
+                window.location.href = '../onboarding/GenderSelection.html';
+            } else if (!user.nickname || !user.partner_nickname) {
+                alert('Log in successful! Let\'s set your nicknames.');
+                window.location.href = '../onboarding/Nickname.html';
+            } else if (!user.relationship_date) {
+                window.location.href = '../onboarding/DateSelection.html';
+            } else if (!user.partner_user_id) {
+                window.location.href = '../onboarding/Pairing.html';
+            } else {
+                alert('Login successful! Redirecting...');
+                window.location.href = '../../index.html';
+            }
+        }
+
+        function requestOtpCode(maskedEmail) {
+            return new Promise((resolve) => {
+                const overlay = document.getElementById('otpModalOverlay');
+                const text = document.getElementById('otpModalText');
+                const digits = Array.from(document.querySelectorAll('#otpInputRow .otp-digit'));
+                const cancelBtn = document.getElementById('otpCancelBtn');
+                const verifyBtn = document.getElementById('otpVerifyBtn');
+                let cleaned = '';
+
+                const close = (value) => {
+                    overlay.style.display = 'none';
+                    digits.forEach((d) => {
+                        d.value = '';
+                    });
+                    digits.forEach((d) => {
+                        d.oninput = null;
+                        d.onkeydown = null;
+                        d.onpaste = null;
+                    });
+                    resolve(value);
+                };
+
+                const collectCode = () => digits.map((d) => d.value).join('');
+
+                text.textContent = `Enter the 6-digit code sent to ${maskedEmail}`;
+                overlay.style.display = 'flex';
+                digits[0].focus();
+
+                digits.forEach((digit, index) => {
+                    digit.oninput = () => {
+                        cleaned = digit.value.replace(/\D/g, '');
+                        digit.value = cleaned.slice(-1);
+                        if (digit.value && index < digits.length - 1) {
+                            digits[index + 1].focus();
+                        }
+                    };
+
+                    digit.onkeydown = (e) => {
+                        if (e.key === 'Backspace' && !digit.value && index > 0) {
+                            digits[index - 1].focus();
+                        }
+                        if (e.key === 'Enter') {
+                            e.preventDefault();
+                            close(collectCode().trim());
+                        }
+                    };
+
+                    digit.onpaste = (e) => {
+                        e.preventDefault();
+                        const paste = (e.clipboardData.getData('text') || '').replace(/\D/g, '').slice(0, 6);
+                        paste.split('').forEach((char, i) => {
+                            if (digits[i]) digits[i].value = char;
+                        });
+                        const nextIndex = Math.min(paste.length, digits.length - 1);
+                        digits[nextIndex].focus();
+                    };
                 });
 
-                const data = await response.json();
-                if (response.ok) {
-                    localStorage.setItem('user', JSON.stringify(data.user));
-                    if (!data.user.nickname || !data.user.partner_nickname) {
-                        alert('Log in successful! Let\'s set your nicknames.');
-                        window.location.href = '../onboarding/Nickname.html';
-                    } else {
-                        alert('Login successful! Redirecting...');
-                        window.location.href = '../../index.html';
-                    }
-                } else {
-                    alert(data.error || 'Login failed.');
+                cancelBtn.onclick = () => close(null);
+                verifyBtn.onclick = () => close(collectCode().trim());
+            });
+        }
+
+        async function handleGoogleCredentialResponse(response) {
+            try {
+                const apiResponse = await fetch(`${CONFIG.API_BASE_URL}/api/auth/google/start`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ credential: response.credential })
+                });
+                const data = await apiResponse.json();
+                if (!apiResponse.ok) {
+                    alert(data.error || 'Google login failed.');
+                    return;
                 }
+
+                const otpCode = await requestOtpCode(data.email);
+                if (!otpCode) {
+                    alert('Verification code is required to continue.');
+                    return;
+                }
+
+                const verifyResponse = await fetch(`${CONFIG.API_BASE_URL}/api/auth/google/verify`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        verificationId: data.verificationId,
+                        code: otpCode
+                    })
+                });
+                const verifyData = await verifyResponse.json();
+                if (!verifyResponse.ok) {
+                    alert(verifyData.error || 'Verification failed.');
+                    return;
+                }
+
+                redirectAfterAuth(verifyData.user);
             } catch (err) {
                 alert('Server connection failed.');
             }
-        });
+        }
+
+        async function setupGoogleLogin() {
+            try {
+                const configResponse = await fetch(`${CONFIG.API_BASE_URL}/api/config/public`);
+                const configData = await configResponse.json();
+                const clientId = configData.googleClientId;
+
+                if (!clientId) {
+                    const shell = document.getElementById('googleLoginShell');
+                    const status = document.getElementById('googleLoginStatus');
+                    shell.classList.add('disabled');
+                    shell.style.pointerEvents = 'none';
+                    status.textContent = 'Google login is not configured yet.';
+                    return;
+                }
+
+                google.accounts.id.initialize({
+                    client_id: clientId,
+                    callback: handleGoogleCredentialResponse
+                });
+                const googleContainer = document.getElementById('googleLoginContainer');
+                const buttonWidth = Math.max(280, Math.min(420, Math.floor(googleContainer.offsetWidth || 320)));
+                google.accounts.id.renderButton(
+                    googleContainer,
+                    {
+                        theme: 'filled_black',
+                        type: 'standard',
+                        size: 'large',
+                        shape: 'pill',
+                        width: buttonWidth,
+                        text: 'signin_with',
+                        logo_alignment: 'left',
+                        locale: 'en'
+                    }
+                );
+            } catch (err) {
+                alert('Could not initialize Google login.');
+            }
+        }
+
+        window.addEventListener('load', setupGoogleLogin);
     </script>
 </body>
 

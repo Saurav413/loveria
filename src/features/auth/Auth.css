@@ -1,12 +1,12 @@
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap');
 
 :root {
-    --primary: #ff4081;
-    --secondary: #7c4dff;
-    --accent: #00e5ff;
-    --bg-gradient: linear-gradient(135deg, #ff4081, #7c4dff, #00e5ff);
-    --glass: rgba(255, 255, 255, 0.15);
-    --glass-border: rgba(255, 255, 255, 0.3);
+    --primary: #ff4db8;
+    --secondary: #8f5bff;
+    --accent: #ff89d6;
+    --bg-gradient: radial-gradient(circle at 20% 20%, #5f2de0 0%, #29105f 48%, #170637 100%);
+    --glass: rgba(42, 18, 78, 0.62);
+    --glass-border: rgba(255, 171, 234, 0.35);
 }
 
 * {
@@ -21,8 +21,10 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    background: url('../../assets/images/signup-bg.png') no-repeat center center/cover;
-    overflow: hidden;
+    background: radial-gradient(circle at 10% 10%, #6d33ec 0%, #2a0e63 45%, #160430 100%);
+    overflow-x: hidden;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
 }
 
 .signup-container {
@@ -34,8 +36,8 @@ body {
     -webkit-backdrop-filter: blur(20px);
     border: 1px solid var(--glass-border);
     border-radius: 24px;
-    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1);
-    color: white;
+    box-shadow: 0 14px 40px rgba(13, 4, 30, 0.5);
+    color: #ffeefe;
     text-align: center;
     position: relative;
     animation: fadeIn 0.8s ease-out;
@@ -152,8 +154,8 @@ p.subtitle {
 }
 
 .social-btn.apple {
-    background: #000;
-    color: white;
+    background: linear-gradient(135deg, #ff4db8, #8f5bff);
+    color: #fff;
 }
 
 .social-btn.google img {

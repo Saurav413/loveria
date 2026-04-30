@@ -8,14 +8,14 @@
     <link rel="stylesheet" href="features/auth/Auth.css">
     <style>
         :root {
-            --primary: #ff4d6d;
-            --primary-light: #ff758f;
-            --bg: #fff0f3;
-            --glass: rgba(255, 255, 255, 0.8);
+            --primary: #ff5cc8;
+            --primary-light: #ff90dd;
+            --bg: #1b083c;
+            --glass: rgba(39, 14, 76, 0.78);
         }
 
         body {
-            background: linear-gradient(135deg, #fff0f3 0%, #ffccd5 100%);
+            background: radial-gradient(circle at 14% 10%, #6e37eb 0%, #2a0f62 46%, #13042f 100%);
             min-height: 100vh;
             display: flex;
             align-items: center;
@@ -23,7 +23,7 @@
             font-family: 'Inter', system-ui, -apple-system, sans-serif;
             margin: 0;
             padding: 20px;
-            color: #333;
+            color: #fde9ff;
         }
 
         .dashboard-container {
@@ -31,7 +31,7 @@
             backdrop-filter: blur(15px);
             padding: 40px;
             border-radius: 32px;
-            box-shadow: 0 20px 50px rgba(255, 77, 109, 0.15);
+            box-shadow: 0 20px 50px rgba(8, 3, 20, 0.5);
             width: 100%;
             max-width: 450px;
             text-align: center;
@@ -81,23 +81,71 @@
 
         .nicknames {
             font-size: 1.2rem;
-            color: #666;
+            color: #e9d0ff;
             margin-bottom: 30px;
             font-style: italic;
         }
 
         .counter-card {
-            background: white;
+            background: linear-gradient(135deg, rgba(35, 14, 67, 0.92) 0%, rgba(53, 24, 96, 0.92) 100%);
             padding: 30px;
             border-radius: 20px;
-            box-shadow: 0 8px 16px rgba(255, 77, 109, 0.1);
+            box-shadow: 0 12px 26px rgba(8, 3, 20, 0.4);
+            border: 1px solid rgba(255, 175, 236, 0.34);
             margin-bottom: 30px;
+        }
+
+        .slideshow-card {
+            background: linear-gradient(135deg, rgba(255, 98, 204, 0.3) 0%, rgba(130, 93, 255, 0.28) 100%);
+            border-radius: 20px;
+            box-shadow: 0 14px 30px rgba(8, 3, 20, 0.35), 0 0 0 1px rgba(255, 255, 255, 0.08) inset;
+            margin-bottom: 20px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 176, 237, 0.42);
+            padding: 8px;
+            backdrop-filter: blur(8px);
+        }
+
+        .slideshow-image {
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            height: auto;
+            max-height: 320px;
+            box-sizing: border-box;
+            padding: 8px;
+            border-radius: 14px;
+            object-fit: contain;
+            display: none;
+            background: linear-gradient(135deg, #2a0f62 0%, #13042f 100%);
+            border: 2px solid rgba(255, 255, 255, 0.92);
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18);
+            opacity: 1;
+            transition: opacity 0.6s ease;
+        }
+
+        .slideshow-image.fading {
+            opacity: 0.15;
+        }
+
+        .slideshow-placeholder {
+            padding: 22px;
+            color: #f2d8ff;
+            font-size: 0.95rem;
+        }
+
+        .slideshow-caption {
+            padding: 10px 14px 14px;
+            color: #f1d6ff;
+            font-size: 0.9rem;
+            text-align: left;
+            min-height: 18px;
         }
 
         .days-number {
             font-size: 4.5rem;
             font-weight: 900;
-            color: var(--primary);
+            color: #ff78d4;
+            text-shadow: 0 0 20px rgba(255, 120, 212, 0.28);
             line-height: 1;
             margin-bottom: 5px;
         }
@@ -106,8 +154,39 @@
             text-transform: uppercase;
             letter-spacing: 2px;
             font-size: 0.9rem;
-            color: #888;
+            color: #f2deff;
             font-weight: 600;
+        }
+
+        .distance-card {
+            background: linear-gradient(135deg, rgba(35, 14, 67, 0.92) 0%, rgba(53, 24, 96, 0.92) 100%);
+            padding: 18px;
+            border-radius: 20px;
+            box-shadow: 0 12px 26px rgba(8, 3, 20, 0.4);
+            border: 1px solid rgba(255, 175, 236, 0.34);
+            margin-bottom: 24px;
+            text-align: left;
+        }
+
+        .distance-title {
+            color: #b987ff;
+            font-weight: 700;
+            margin-bottom: 8px;
+            font-size: 1rem;
+        }
+
+        .distance-main {
+            color: #f7e8ff;
+            font-weight: 800;
+            font-size: 1.2rem;
+            margin-bottom: 8px;
+        }
+
+        .distance-line {
+            color: #dcc0ff;
+            font-size: 0.88rem;
+            margin: 4px 0;
+            word-break: break-word;
         }
 
         .menu-grid {
@@ -117,18 +196,18 @@
         }
 
         .menu-item {
-            background: rgba(255, 255, 255, 0.5);
+            background: rgba(255, 255, 255, 0.12);
             padding: 20px;
             border-radius: 16px;
             text-decoration: none;
-            color: #444;
+            color: #f7e8ff;
             font-weight: 600;
             transition: all 0.3s ease;
             border: 1px solid transparent;
         }
 
         .menu-item:hover {
-            background: white;
+            background: rgba(255, 255, 255, 0.25);
             transform: translateY(-3px);
             border-color: var(--primary-light);
             color: var(--primary);
@@ -178,6 +257,21 @@
             <div class="days-label">Days of Love</div>
         </div>
 
+        <div class="distance-card">
+            <div class="distance-title">Our Distance</div>
+            <div id="distanceMain" class="distance-main">Detecting locations...</div>
+            <div id="selfLocationLine" class="distance-line">Your location: --</div>
+            <div id="partnerLocationLine" class="distance-line">Partner location: --</div>
+        </div>
+
+        <div class="slideshow-card">
+            <img id="sharedSlideshowImage" class="slideshow-image" alt="Shared memory slideshow">
+            <div id="slideshowPlaceholder" class="slideshow-placeholder">
+                No shared slideshow photos yet. Add photos from Shared Slideshow.
+            </div>
+            <div id="slideshowCaption" class="slideshow-caption"></div>
+        </div>
+
         <div class="menu-grid">
             <a href="features/countdown/index.html" class="menu-item">
                 <span>⏳</span><br>Countdown
@@ -193,6 +287,12 @@
             </a>
             <a href="features/reminders/ReminderSetup.html" class="menu-item">
                 <span>🗓️</span><br>Reminders
+            </a>
+            <a href="features/drawing/SharedDrawing.html" class="menu-item">
+                <span>✍️</span><br>Live Drawing
+            </a>
+            <a href="features/memories/SharedSlideshow.html" class="menu-item">
+                <span>🖼️</span><br>Shared Slideshow
             </a>
         </div>
 
@@ -225,6 +325,11 @@
             }
 
             // 3. Check onboarding status
+            if (!dbUser.gender) {
+                window.location.href = 'features/onboarding/GenderSelection.html';
+                return;
+            }
+
             if (!dbUser.nickname || !dbUser.partner_nickname) {
                 window.location.href = 'features/onboarding/Nickname.html';
                 return;
@@ -232,6 +337,11 @@
 
             if (!dbUser.relationship_date) {
                 window.location.href = 'features/onboarding/DateSelection.html';
+                return;
+            }
+
+            if (!dbUser.partner_user_id) {
+                window.location.href = 'features/onboarding/Pairing.html';
                 return;
             }
 
@@ -249,6 +359,185 @@
             };
 
             calcDays();
+
+            const slideshowImage = document.getElementById('sharedSlideshowImage');
+            const slideshowPlaceholder = document.getElementById('slideshowPlaceholder');
+            const slideshowCaption = document.getElementById('slideshowCaption');
+            const SLIDESHOW_INTERVAL_MS = 3000;
+            let slideshowPhotos = [];
+            let slideshowIndex = 0;
+            let isAnimating = false;
+            let slideshowRefreshTimer = null;
+            let slideshowTickTimer = null;
+            let serverTimeOffsetMs = 0;
+            let locationRefreshTimer = null;
+
+            const renderSlideshow = () => {
+                if (!slideshowPhotos.length) {
+                    slideshowImage.style.display = 'none';
+                    slideshowPlaceholder.style.display = 'block';
+                    slideshowCaption.textContent = '';
+                    return;
+                }
+                slideshowPlaceholder.style.display = 'none';
+                slideshowImage.style.display = 'block';
+                slideshowCaption.textContent = slideshowPhotos[slideshowIndex].caption || '';
+
+                if (!slideshowImage.src) {
+                    slideshowImage.src = slideshowPhotos[slideshowIndex].image_data;
+                    return;
+                }
+
+                if (isAnimating) return;
+                isAnimating = true;
+                slideshowImage.classList.add('fading');
+                setTimeout(() => {
+                    slideshowImage.src = slideshowPhotos[slideshowIndex].image_data;
+                    slideshowImage.classList.remove('fading');
+                    isAnimating = false;
+                }, 280);
+            };
+
+            const getServerNowMs = () => Date.now() + serverTimeOffsetMs;
+
+            const getSynchronizedIndex = () => {
+                if (!slideshowPhotos.length) return 0;
+                const anchorMs = Date.parse(slideshowPhotos[0].created_at) || 0;
+                const elapsedMs = Math.max(getServerNowMs() - anchorMs, 0);
+                return Math.floor(elapsedMs / SLIDESHOW_INTERVAL_MS) % slideshowPhotos.length;
+            };
+
+            const startSynchronizedTicker = () => {
+                if (slideshowTickTimer) clearInterval(slideshowTickTimer);
+                slideshowTickTimer = setInterval(() => {
+                    if (!slideshowPhotos.length) return;
+                    const nextIndex = getSynchronizedIndex();
+                    if (nextIndex !== slideshowIndex) {
+                        slideshowIndex = nextIndex;
+                        renderSlideshow();
+                    }
+                }, 500);
+            };
+
+            const refreshSlideshow = async () => {
+                const response = await fetch(`${CONFIG.API_BASE_URL}/api/slideshow/${dbUser.id}`);
+                const data = await response.json();
+                const serverDateHeader = response.headers.get('date');
+                if (serverDateHeader) {
+                    const serverNow = Date.parse(serverDateHeader);
+                    if (!Number.isNaN(serverNow)) {
+                        serverTimeOffsetMs = serverNow - Date.now();
+                    }
+                }
+
+                if (response.ok && Array.isArray(data.photos)) {
+                    slideshowPhotos = [...data.photos].sort((a, b) => {
+                        const timeA = Date.parse(a.created_at) || 0;
+                        const timeB = Date.parse(b.created_at) || 0;
+                        if (timeA !== timeB) return timeA - timeB;
+                        return Number(a.id) - Number(b.id);
+                    });
+                    if (!slideshowPhotos.length) {
+                        slideshowIndex = 0;
+                    } else {
+                        slideshowIndex = getSynchronizedIndex();
+                    }
+                    renderSlideshow();
+                    startSynchronizedTicker();
+                } else {
+                    slideshowPhotos = [];
+                    slideshowIndex = 0;
+                    renderSlideshow();
+                }
+            };
+
+            const distanceMain = document.getElementById('distanceMain');
+            const selfLocationLine = document.getElementById('selfLocationLine');
+            const partnerLocationLine = document.getElementById('partnerLocationLine');
+
+            const formatCoord = (lat, lng) => {
+                if (lat == null || lng == null) return 'Not shared yet';
+                return `${Number(lat).toFixed(5)}, ${Number(lng).toFixed(5)}`;
+            };
+
+            const updateLocationOnServer = async (latitude, longitude) => {
+                await fetch(`${CONFIG.API_BASE_URL}/api/location/update`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        userId: dbUser.id,
+                        latitude,
+                        longitude
+                    })
+                });
+            };
+
+            const refreshDistanceCard = async () => {
+                try {
+                    const response = await fetch(`${CONFIG.API_BASE_URL}/api/location/${dbUser.id}`);
+                    const data = await response.json();
+                    if (!response.ok) {
+                        distanceMain.textContent = data.error || 'Could not load distance.';
+                        return;
+                    }
+
+                    const selfName = data.self?.nickname || 'You';
+                    const partnerName = data.partner?.nickname || 'Partner';
+
+                    selfLocationLine.textContent = `${selfName}: ${formatCoord(data.self?.latitude, data.self?.longitude)}`;
+                    partnerLocationLine.textContent = `${partnerName}: ${formatCoord(data.partner?.latitude, data.partner?.longitude)}`;
+
+                    if (data.distance_km == null) {
+                        distanceMain.textContent = 'Waiting for both locations...';
+                    } else {
+                        distanceMain.textContent = `${Number(data.distance_km).toFixed(2)} km apart`;
+                    }
+                } catch (err) {
+                    distanceMain.textContent = 'Could not load distance.';
+                }
+            };
+
+            const captureAndSyncLocation = async () => {
+                if (!navigator.geolocation) {
+                    distanceMain.textContent = 'Geolocation is not supported on this device.';
+                    return;
+                }
+
+                const getPosition = () => new Promise((resolve, reject) => {
+                    navigator.geolocation.getCurrentPosition(resolve, reject, {
+                        enableHighAccuracy: true,
+                        timeout: 15000,
+                        maximumAge: 60000
+                    });
+                });
+
+                try {
+                    const position = await getPosition();
+                    await updateLocationOnServer(position.coords.latitude, position.coords.longitude);
+                } catch (err) {
+                    if (err && err.code === 1) {
+                        distanceMain.textContent = 'Location permission denied.';
+                    } else {
+                        distanceMain.textContent = 'Could not get current location.';
+                    }
+                }
+
+                await refreshDistanceCard();
+            };
+
+            try {
+                await refreshSlideshow();
+                if (slideshowRefreshTimer) {
+                    clearInterval(slideshowRefreshTimer);
+                }
+                slideshowRefreshTimer = setInterval(refreshSlideshow, 5000);
+            } catch (err) {
+                renderSlideshow();
+            }
+
+            await captureAndSyncLocation();
+            if (locationRefreshTimer) clearInterval(locationRefreshTimer);
+            locationRefreshTimer = setInterval(captureAndSyncLocation, 60000);
         });
 
         function logout() {

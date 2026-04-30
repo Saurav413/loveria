@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pair With Partner - Loveria</title>
+    <link rel="stylesheet" href="../auth/Auth.css">
+    <script src="../../utils/config.js"></script>
+    <style>
+        :root {
+            --primary: #ff5cc8;
+            --primary-light: #ff90dd;
+            --glass: rgba(39, 14, 76, 0.78);
+        }
+
+        body {
+            background: radial-gradient(circle at 14% 10%, #6e37eb 0%, #2a0f62 46%, #13042f 100%);
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 520px;
+            background: var(--glass);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            border-radius: 22px;
+            padding: 28px;
+            box-shadow: 0 14px 36px rgba(8, 3, 20, 0.5);
+        }
+
+        h1 {
+            margin: 0 0 8px;
+            color: var(--primary);
+            text-align: center;
+        }
+
+        .subtitle {
+            color: #e7cfff;
+            margin-bottom: 18px;
+            text-align: center;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.94);
+            border: 1px solid #eee;
+            border-radius: 12px;
+            padding: 14px;
+            margin-bottom: 14px;
+        }
+
+        .card h3 {
+            margin-top: 0;
+            color: #333;
+        }
+
+        .input {
+            width: 100%;
+            box-sizing: border-box;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 12px;
+            font-size: 1rem;
+            color: #111;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .input-error {
+            margin-top: 8px;
+            color: #d6336c;
+            font-size: 0.9rem;
+            min-height: 20px;
+        }
+
+        .btn {
+            width: 100%;
+            border: none;
+            border-radius: 10px;
+            padding: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: #fff;
+        }
+
+        .btn-secondary {
+            background: #f2f2f2;
+            color: #333;
+        }
+
+        .code-box {
+            background: #fff5f8;
+            border: 1px dashed #ff9fb2;
+            border-radius: 12px;
+            padding: 12px;
+            margin-top: 10px;
+            text-align: center;
+            color: #d6336c;
+            font-size: 1.4rem;
+            font-weight: 800;
+            letter-spacing: 4px;
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Pair With Your Partner</h1>
+        <p class="subtitle">Choose one option: enter your partner's code, or create your own code.</p>
+
+        <div class="card">
+            <h3>Option 1: Enter Pairing Code</h3>
+            <input id="pairingCodeInput" class="input" type="text" maxlength="6" placeholder="ABC123">
+            <div id="pairingCodeError" class="input-error"></div>
+            <button id="connectBtn" class="btn btn-primary" type="button">Connect With Code</button>
+        </div>
+
+        <div class="card">
+            <h3>Option 2: Create Pairing Code</h3>
+            <p style="margin: 0 0 8px; color:#666; font-size:0.92rem;">Share this code with your partner so they can connect to you.</p>
+            <button id="createCodeBtn" class="btn btn-secondary" type="button">Create My Pairing Code</button>
+            <div id="codeBox" class="code-box"></div>
+        </div>
+
+    </div>
+
+    <script>
+        const user = JSON.parse(localStorage.getItem('user'));
+        if (!user || !user.id) {
+            window.location.href = '../auth/Login.html';
+        }
+        const pairingCodeInput = document.getElementById('pairingCodeInput');
+        const pairingCodeError = document.getElementById('pairingCodeError');
+
+        pairingCodeInput.addEventListener('input', () => {
+            pairingCodeError.textContent = '';
+        });
+
+        async function refreshUser() {
+            const response = await fetch(`${CONFIG.API_BASE_URL}/api/user/${user.id}`);
+            const data = await response.json();
+            if (response.ok && data.user) {
+                localStorage.setItem('user', JSON.stringify(data.user));
+                return data.user;
+            }
+            return JSON.parse(localStorage.getItem('user'));
+        }
+
+        async function redirectIfPaired() {
+            const latestUser = await refreshUser();
+            if (latestUser && latestUser.partner_user_id) {
+                window.location.href = '../../index.html';
+                return true;
+            }
+            return false;
+        }
+
+        document.getElementById('connectBtn').addEventListener('click', async () => {
+            const code = pairingCodeInput.value.trim().toUpperCase();
+            pairingCodeError.textContent = '';
+
+            if (!code || code.length < 6) {
+                pairingCodeError.textContent = 'Incorrect code. Please try again';
+                return;
+            }
+
+            const response = await fetch(`${CONFIG.API_BASE_URL}/api/pairing/connect`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ userId: user.id, code })
+            });
+
+            const data = await response.json();
+            if (!response.ok) {
+                pairingCodeError.textContent = 'Incorrect code. Please try again';
+                return;
+            }
+
+            if (data.user) {
+                localStorage.setItem('user', JSON.stringify(data.user));
+            }
+            window.location.href = '../../index.html';
+        });
+
+        document.getElementById('createCodeBtn').addEventListener('click', async () => {
+            const response = await fetch(`${CONFIG.API_BASE_URL}/api/pairing/create-code`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ userId: user.id })
+            });
+
+            const data = await response.json();
+            if (!response.ok) {
+                alert(data.error || 'Failed to create pairing code.');
+                return;
+            }
+
+            const codeBox = document.getElementById('codeBox');
+            codeBox.textContent = data.code;
+            codeBox.style.display = 'block';
+        });
+
+        (async function initPairingWatcher() {
+            await redirectIfPaired();
+            setInterval(redirectIfPaired, 4000);
+        })();
+    </script>
+</body>
+
+</html>

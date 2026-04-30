@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shared Drawing - Loveria</title>
+    <link rel="stylesheet" href="../auth/Auth.css">
+    <script src="../../utils/config.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <style>
+        :root {
+            --primary: #ff5cc8;
+            --primary-light: #ff90dd;
+            --glass: rgba(39, 14, 76, 0.78);
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            padding: 20px;
+            box-sizing: border-box;
+            background: radial-gradient(circle at 14% 10%, #6e37eb 0%, #2a0f62 46%, #13042f 100%);
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            color: #fde9ff;
+        }
+
+        .container {
+            max-width: 920px;
+            margin: 0 auto;
+            background: var(--glass);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            border-radius: 24px;
+            box-shadow: 0 14px 36px rgba(8, 3, 20, 0.5);
+            padding: 22px;
+        }
+
+        h1 {
+            margin: 0 0 8px;
+            color: var(--primary);
+        }
+
+        .subtitle {
+            margin: 0 0 16px;
+            color: #ebd4ff;
+        }
+
+        .board-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 16px;
+        }
+
+        .panel {
+            background: rgba(255, 255, 255, 0.94);
+            border-radius: 14px;
+            border: 1px solid #eee;
+            padding: 12px;
+        }
+
+        .panel h3 {
+            margin: 0 0 10px;
+            color: #444;
+            font-size: 1rem;
+        }
+
+        canvas {
+            width: 100%;
+            height: 320px;
+            border-radius: 10px;
+            border: 1px solid #ffd3dd;
+            background: #fff;
+            touch-action: pan-y;
+        }
+
+        .controls {
+            margin-top: 10px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            border: none;
+            border-radius: 10px;
+            padding: 10px 14px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: #fff;
+        }
+
+        .btn-secondary {
+            background: #f2f2f2;
+            color: #333;
+        }
+
+        .status {
+            margin-top: 10px;
+            font-size: 0.9rem;
+            color: #666;
+            min-height: 18px;
+        }
+
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Live Shared Drawing</h1>
+        <p class="subtitle">Draw on the left. Your partner sees updates in their app automatically.</p>
+
+        <div class="board-grid">
+            <div class="panel">
+                <h3>Your Drawing</h3>
+                <canvas id="drawCanvas" width="600" height="420"></canvas>
+                <div class="controls">
+                    <button id="clearBtn" class="btn btn-secondary" type="button">Clear</button>
+                    <button id="saveBtn" class="btn btn-primary" type="button">Save now</button>
+                </div>
+                <div id="saveStatus" class="status"></div>
+            </div>
+
+            <div class="panel">
+                <h3>Partner Live View</h3>
+                <canvas id="partnerCanvas" width="600" height="420"></canvas>
+                <div id="partnerStatus" class="status">Waiting for partner drawing...</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const user = JSON.parse(localStorage.getItem('user'));
+        if (!user || !user.id) {
+            window.location.href = '../auth/Login.html';
+        }
+        if (!user.partner_user_id) {
+            window.location.href = '../onboarding/Pairing.html';
+        }
+
+        const canvas = document.getElementById('drawCanvas');
+        const ctx = canvas.getContext('2d');
+        const partnerCanvas = document.getElementById('partnerCanvas');
+        const partnerCtx = partnerCanvas.getContext('2d');
+        const saveStatus = document.getElementById('saveStatus');
+        const partnerStatus = document.getElementById('partnerStatus');
+        const socket = io(CONFIG.API_BASE_URL);
+        let isDrawing = false;
+        let isDirty = false;
+        let lastX = 0;
+        let lastY = 0;
+
+        function showSaveStatus(message) {
+            saveStatus.textContent = message;
+        }
+
+        function toCanvasPoint(event) {
+            const rect = canvas.getBoundingClientRect();
+            if (event.touches && event.touches[0]) {
+                return {
+                    x: (event.touches[0].clientX - rect.left) * (canvas.width / rect.width),
+                    y: (event.touches[0].clientY - rect.top) * (canvas.height / rect.height)
+                };
+            }
+            return {
+                x: (event.clientX - rect.left) * (canvas.width / rect.width),
+                y: (event.clientY - rect.top) * (canvas.height / rect.height)
+            };
+        }
+
+        function beginDraw(event) {
+            isDrawing = true;
+            const point = toCanvasPoint(event);
+            lastX = point.x;
+            lastY = point.y;
+        }
+
+        function draw(event) {
+            if (!isDrawing) return;
+            const point = toCanvasPoint(event);
+            const stroke = {
+                fromX: lastX,
+                fromY: lastY,
+                toX: point.x,
+                toY: point.y,
+                color: '#ff4d6d',
+                lineWidth: 4
+            };
+            drawStroke(ctx, stroke);
+            socket.emit('drawing-stroke', { stroke });
+            lastX = point.x;
+            lastY = point.y;
+            isDirty = true;
+        }
+
+        function drawStroke(targetCtx, stroke) {
+            targetCtx.beginPath();
+            targetCtx.moveTo(stroke.fromX, stroke.fromY);
+            targetCtx.lineTo(stroke.toX, stroke.toY);
+            targetCtx.strokeStyle = stroke.color || '#ff4d6d';
+            targetCtx.lineWidth = Number(stroke.lineWidth || 4);
+            targetCtx.lineCap = 'round';
+            targetCtx.lineJoin = 'round';
+            targetCtx.stroke();
+        }
+
+        function endDraw() {
+            if (!isDrawing) return;
+            isDrawing = false;
+            if (isDirty) {
+                saveDrawing();
+                isDirty = false;
+            }
+        }
+
+        async function saveDrawing() {
+            const imageData = canvas.toDataURL('image/png');
+            const response = await fetch(`${CONFIG.API_BASE_URL}/api/drawing/save`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    userId: user.id,
+                    imageData
+                })
+            });
+
+            const data = await response.json();
+            if (!response.ok) {
+                showSaveStatus(data.error || 'Failed to save drawing.');
+                return;
+            }
+            showSaveStatus(`Saved at ${new Date().toLocaleTimeString()}`);
+        }
+
+        async function loadSelfDrawing() {
+            try {
+                const response = await fetch(`${CONFIG.API_BASE_URL}/api/drawing/self/${user.id}`);
+                if (!response.ok) return;
+                const data = await response.json();
+                const img = new Image();
+                img.onload = () => {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                };
+                img.src = data.drawing.image_data;
+            } catch (err) {
+                console.warn('Could not load self drawing:', err);
+            }
+        }
+
+        async function loadPartnerDrawing() {
+            try {
+                const response = await fetch(`${CONFIG.API_BASE_URL}/api/drawing/partner/${user.id}`);
+                const data = await response.json();
+                if (!response.ok) {
+                    partnerStatus.textContent = data.error || 'Waiting for partner drawing...';
+                    return;
+                }
+                const img = new Image();
+                img.onload = () => {
+                    partnerCtx.clearRect(0, 0, partnerCanvas.width, partnerCanvas.height);
+                    partnerCtx.drawImage(img, 0, 0, partnerCanvas.width, partnerCanvas.height);
+                };
+                img.src = data.drawing.image_data;
+                partnerStatus.textContent = `Last update: ${new Date(data.drawing.updated_at).toLocaleTimeString()}`;
+            } catch (err) {
+                partnerStatus.textContent = 'Waiting for partner drawing...';
+            }
+        }
+
+        document.getElementById('saveBtn').addEventListener('click', saveDrawing);
+        document.getElementById('clearBtn').addEventListener('click', () => {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            socket.emit('drawing-clear');
+            saveDrawing();
+        });
+
+        canvas.addEventListener('pointerdown', beginDraw);
+        canvas.addEventListener('pointermove', draw);
+        window.addEventListener('pointerup', endDraw);
+        canvas.addEventListener('pointerleave', endDraw);
+        canvas.addEventListener('pointercancel', endDraw);
+
+        socket.on('connect', () => {
+            socket.emit('join-pair-room', { userId: user.id });
+        });
+
+        socket.on('drawing-stroke', ({ stroke }) => {
+            drawStroke(partnerCtx, stroke);
+            partnerStatus.textContent = `Live update: ${new Date().toLocaleTimeString()}`;
+        });
+
+        socket.on('drawing-clear', () => {
+            partnerCtx.clearRect(0, 0, partnerCanvas.width, partnerCanvas.height);
+            partnerStatus.textContent = 'Partner cleared the canvas.';
+        });
+
+        socket.on('drawing-error', ({ message }) => {
+            partnerStatus.textContent = message || 'Realtime sync unavailable.';
+        });
+
+        (async function init() {
+            await loadSelfDrawing();
+            await loadPartnerDrawing();
+            setInterval(loadPartnerDrawing, 2500);
+        })();
+    </script>
+</body>
+
+</html>

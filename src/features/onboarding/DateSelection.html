@@ -9,14 +9,17 @@
     <script src="../../utils/config.js"></script>
     <style>
         :root {
-            --primary: #ff4d6d;
-            --primary-light: #ff758f;
-            --bg: #fff0f3;
-            --glass: rgba(255, 255, 255, 0.8);
+            --primary: #ff5cc8;
+            --primary-light: #b46bff;
+            --bg: #12031f;
+            --glass: rgba(32, 15, 58, 0.7);
         }
 
         body {
-            background: linear-gradient(135deg, #fff0f3 0%, #ffccd5 100%);
+            background:
+                radial-gradient(circle at 15% 20%, rgba(255, 92, 200, 0.28) 0%, transparent 45%),
+                radial-gradient(circle at 85% 80%, rgba(121, 76, 255, 0.25) 0%, transparent 42%),
+                linear-gradient(145deg, #12031f 0%, #1b0834 55%, #271146 100%);
             min-height: 100vh;
             display: flex;
             align-items: center;
@@ -31,11 +34,11 @@
             backdrop-filter: blur(10px);
             padding: 40px;
             border-radius: 24px;
-            box-shadow: 0 10px 30px rgba(255, 77, 109, 0.1);
+            box-shadow: 0 16px 40px rgba(8, 3, 20, 0.45);
             width: 100%;
             max-width: 400px;
             text-align: center;
-            border: 1px solid rgba(255, 255, 255, 0.4);
+            border: 1px solid rgba(255, 170, 236, 0.28);
             animation: fadeIn 0.8s ease-out;
         }
 
@@ -52,14 +55,14 @@
         }
 
         h1 {
-            color: var(--primary);
+            color: #ffd7f7;
             font-size: 2.2rem;
             margin-bottom: 8px;
             font-weight: 800;
         }
 
         .subtitle {
-            color: #666;
+            color: #d9c7f3;
             margin-bottom: 32px;
             font-size: 0.95rem;
             line-height: 1.5;
@@ -74,33 +77,33 @@
             display: block;
             margin-bottom: 8px;
             font-weight: 600;
-            color: #444;
+            color: #efdcff;
             font-size: 0.9rem;
         }
 
         input[type="date"] {
             width: 100%;
             padding: 14px 16px;
-            border: 2px solid #edeff2;
+            border: 2px solid rgba(255, 170, 236, 0.26);
             border-radius: 12px;
             font-size: 1rem;
             transition: all 0.3s ease;
             box-sizing: border-box;
-            background: white;
-            color: #333;
+            background: rgba(255, 255, 255, 0.1);
+            color: #f8edff;
             font-family: inherit;
         }
 
         input[type="date"]:focus {
             border-color: var(--primary-light);
             outline: none;
-            box-shadow: 0 0 0 4px rgba(255, 77, 109, 0.1);
+            box-shadow: 0 0 0 4px rgba(255, 92, 200, 0.2);
         }
 
         .save-btn {
             width: 100%;
             padding: 16px;
-            background: var(--primary);
+            background: linear-gradient(135deg, #ff5cc8 0%, #8f5bff 100%);
             color: white;
             border: none;
             border-radius: 12px;
@@ -108,7 +111,7 @@
             font-weight: 700;
             cursor: pointer;
             transition: all 0.3s ease;
-            box-shadow: 0 4px 12px rgba(255, 77, 109, 0.2);
+            box-shadow: 0 10px 24px rgba(143, 91, 255, 0.35);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -116,9 +119,9 @@
         }
 
         .save-btn:hover {
-            background: #ff758f;
+            background: linear-gradient(135deg, #ff72d2 0%, #a66bff 100%);
             transform: translateY(-2px);
-            box-shadow: 0 6px 16px rgba(255, 77, 109, 0.3);
+            box-shadow: 0 12px 28px rgba(143, 91, 255, 0.4);
         }
 
         .save-btn:active {
@@ -189,7 +192,7 @@
                 <input type="date" id="relationshipDate" required>
             </div>
             <button type="submit" class="save-btn">
-                Complete Setup ✨
+                Next: Add Profile Picture 📷
             </button>
             <a href="./Nickname.html" class="back-link">← Change Nicknames</a>
         </form>
@@ -227,8 +230,8 @@
                         ...user,
                         relationship_date: relationshipDate
                     }));
-                    alert('Engagement successful! Set your first reminder.');
-                    window.location.href = '../reminders/ReminderSetup.html';
+                    alert('Date saved! Add your profile picture next.');
+                    window.location.href = './ProfilePicture.html';
                 } else {
                     alert(data.error || 'Failed to update relationship date.');
                 }

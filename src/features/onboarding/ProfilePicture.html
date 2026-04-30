@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Couple Photo - Loveria</title>
+    <title>Profile Picture - Loveria</title>
     <link rel="stylesheet" href="../auth/Auth.css">
     <script src="../../utils/config.js"></script>
     <style>
@@ -30,7 +30,7 @@
 
         .container {
             width: 100%;
-            max-width: 520px;
+            max-width: 460px;
             background: var(--glass);
             border: 1px solid rgba(255, 170, 236, 0.28);
             border-radius: 22px;
@@ -65,13 +65,14 @@
         }
 
         .preview {
-            margin: 14px 0;
-            width: 100%;
-            max-height: 320px;
+            margin: 14px auto;
+            width: 180px;
+            height: 180px;
             object-fit: cover;
-            border-radius: 14px;
-            border: 1px solid rgba(255, 170, 236, 0.25);
+            border-radius: 50%;
+            border: 2px solid rgba(255, 170, 236, 0.42);
             display: none;
+            background: rgba(255, 255, 255, 0.15);
         }
 
         .btn-row {
@@ -98,24 +99,34 @@
             background: rgba(255, 255, 255, 0.16);
             color: #f2e6ff;
         }
+
+        .back-link {
+            display: inline-block;
+            margin-top: 14px;
+            color: #d9c7f3;
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
     </style>
 </head>
 
 <body>
     <div class="container">
-        <h1>Add Your Couple Photo</h1>
-        <p class="subtitle">Upload one special photo of both of you.</p>
+        <h1>Add Your Profile Picture</h1>
+        <p class="subtitle">Upload a photo to personalize your Loveria profile.</p>
 
         <div class="picker">
-            <input type="file" id="couplePhoto" accept="image/*">
+            <input type="file" id="profilePhoto" accept="image/*">
         </div>
 
-        <img id="preview" class="preview" alt="Couple photo preview">
+        <img id="preview" class="preview" alt="Profile picture preview">
 
         <div class="btn-row">
-            <button class="btn btn-primary" id="saveBtn" type="button">Save Photo</button>
-            <button class="btn btn-secondary" id="skipBtn" type="button">Skip for now</button>
+            <button class="btn btn-primary" id="saveBtn" type="button">Save & Continue</button>
+            <button class="btn btn-secondary" id="skipBtn" type="button">Skip</button>
         </div>
+
+        <a href="./DateSelection.html" class="back-link">← Back to date selection</a>
     </div>
 
     <script>
@@ -124,7 +135,7 @@
             window.location.href = '../auth/Login.html';
         }
 
-        const fileInput = document.getElementById('couplePhoto');
+        const fileInput = document.getElementById('profilePhoto');
         const preview = document.getElementById('preview');
         let selectedImageData = '';
 
@@ -143,11 +154,11 @@
 
         document.getElementById('saveBtn').addEventListener('click', async () => {
             if (!selectedImageData) {
-                alert('Please select a photo first.');
+                alert('Please select a profile picture first, or tap Skip.');
                 return;
             }
 
-            const response = await fetch(`${CONFIG.API_BASE_URL}/api/couple-photo`, {
+            const response = await fetch(`${CONFIG.API_BASE_URL}/api/user/profile-picture`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -158,16 +169,16 @@
 
             const data = await response.json();
             if (!response.ok) {
-                alert(data.error || 'Failed to save photo.');
+                alert(data.error || 'Failed to save profile picture.');
                 return;
             }
 
-            alert('Photo saved successfully!');
-            window.location.href = '../../index.html';
+            alert('Profile picture saved!');
+            window.location.href = './Pairing.html';
         });
 
         document.getElementById('skipBtn').addEventListener('click', () => {
-            window.location.href = '../../index.html';
+            window.location.href = './Pairing.html';
         });
     </script>
 </body>

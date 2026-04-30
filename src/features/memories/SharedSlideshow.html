@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shared Slideshow - Loveria</title>
+    <link rel="stylesheet" href="../auth/Auth.css">
+    <script src="../../utils/config.js"></script>
+    <style>
+        :root {
+            --primary: #ff5cc8;
+            --glass: rgba(39, 14, 76, 0.78);
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            padding: 20px;
+            box-sizing: border-box;
+            background: radial-gradient(circle at 14% 10%, #6e37eb 0%, #2a0f62 46%, #13042f 100%);
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            color: #fde9ff;
+        }
+
+        .container {
+            max-width: 860px;
+            margin: 0 auto;
+            background: var(--glass);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            border-radius: 24px;
+            box-shadow: 0 14px 36px rgba(8, 3, 20, 0.5);
+            padding: 22px;
+        }
+
+        h1 {
+            margin: 0 0 8px;
+            color: var(--primary);
+        }
+
+        .subtitle {
+            margin: 0 0 16px;
+            color: #e7cfff;
+        }
+
+        .uploader {
+            background: #fff;
+            border-radius: 14px;
+            border: 1px solid #eee;
+            padding: 12px;
+            margin-bottom: 14px;
+        }
+
+        .uploader input {
+            width: 100%;
+            margin-bottom: 10px;
+        }
+
+        .caption-input {
+            width: 100%;
+            box-sizing: border-box;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 10px 12px;
+            margin-bottom: 10px;
+            color: #111;
+        }
+
+        .btn {
+            border: none;
+            border-radius: 10px;
+            padding: 10px 14px;
+            font-weight: 700;
+            cursor: pointer;
+            background: var(--primary);
+            color: #fff;
+        }
+
+        #uploadStatus {
+            margin-top: 8px;
+            color: #666;
+            min-height: 20px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 10px;
+        }
+
+        .photo {
+            width: 100%;
+            aspect-ratio: 4 / 3;
+            height: auto;
+            box-sizing: border-box;
+            padding: 8px;
+            border-radius: 14px;
+            object-fit: contain;
+            border: 2px solid rgba(255, 255, 255, 0.92);
+            background: radial-gradient(circle at 30% 20%, #3e1a79 0%, #180734 100%);
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18);
+        }
+
+        .photo-card {
+            background: linear-gradient(135deg, rgba(255, 98, 204, 0.34) 0%, rgba(130, 93, 255, 0.3) 100%);
+            border-radius: 16px;
+            border: 1px solid rgba(255, 176, 237, 0.42);
+            overflow: hidden;
+            padding: 8px;
+            box-shadow: 0 10px 24px rgba(8, 3, 20, 0.35), 0 0 0 1px rgba(255, 255, 255, 0.08) inset;
+            backdrop-filter: blur(8px);
+        }
+
+        .photo-caption {
+            padding: 8px 10px 0;
+            color: #f4e3ff;
+            font-size: 0.85rem;
+            min-height: 30px;
+        }
+
+        .photo-actions {
+            padding: 8px 10px 10px;
+        }
+
+        .btn-delete {
+            width: 100%;
+            border: none;
+            border-radius: 8px;
+            padding: 8px;
+            font-weight: 700;
+            cursor: pointer;
+            background: #ffe5ec;
+            color: #b42349;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Shared Slideshow</h1>
+        <p class="subtitle">You and your partner can upload photos here. They appear on both home screens.</p>
+
+        <div class="uploader">
+            <input id="photoInput" type="file" accept="image/*">
+            <input id="captionInput" class="caption-input" type="text" maxlength="255" placeholder="Add a caption (optional)">
+            <button id="uploadBtn" class="btn" type="button">Upload to shared slideshow</button>
+            <div id="uploadStatus"></div>
+        </div>
+
+        <div id="photoGrid" class="grid"></div>
+    </div>
+
+    <script>
+        const user = JSON.parse(localStorage.getItem('user'));
+        if (!user || !user.id) {
+            window.location.href = '../auth/Login.html';
+        }
+        if (!user.partner_user_id) {
+            window.location.href = '../onboarding/Pairing.html';
+        }
+
+        const uploadStatus = document.getElementById('uploadStatus');
+        const photoGrid = document.getElementById('photoGrid');
+        let slideshowPollTimer = null;
+
+        function showStatus(message) {
+            uploadStatus.textContent = message;
+        }
+
+        function escapeHtml(text) {
+            return String(text || '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
+        function fileToDataUrl(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(String(reader.result || ''));
+                reader.onerror = () => reject(new Error('Could not read selected file.'));
+                reader.readAsDataURL(file);
+            });
+        }
+
+        function loadImage(dataUrl) {
+            return new Promise((resolve, reject) => {
+                const img = new Image();
+                img.onload = () => resolve(img);
+                img.onerror = () => reject(new Error('Invalid image file.'));
+                img.src = dataUrl;
+            });
+        }
+
+        async function compressImageFile(file) {
+            const originalDataUrl = await fileToDataUrl(file);
+            const img = await loadImage(originalDataUrl);
+
+            // Keep full image visible by fitting it inside a fixed slideshow frame.
+            // This avoids any crop/cut while still producing a consistent slide size.
+            const frameWidth = 1280;
+            const frameHeight = 720;
+            const scale = Math.min(frameWidth / img.width, frameHeight / img.height);
+            const drawWidth = Math.round(img.width * scale);
+            const drawHeight = Math.round(img.height * scale);
+            const offsetX = Math.floor((frameWidth - drawWidth) / 2);
+            const offsetY = Math.floor((frameHeight - drawHeight) / 2);
+            const canvas = document.createElement('canvas');
+            canvas.width = frameWidth;
+            canvas.height = frameHeight;
+            const ctx = canvas.getContext('2d');
+
+            // Background bars that blend with app theme.
+            const bgGradient = ctx.createLinearGradient(0, 0, frameWidth, frameHeight);
+            bgGradient.addColorStop(0, '#2a0f62');
+            bgGradient.addColorStop(1, '#13042f');
+            ctx.fillStyle = bgGradient;
+            ctx.fillRect(0, 0, frameWidth, frameHeight);
+
+            ctx.drawImage(img, offsetX, offsetY, drawWidth, drawHeight);
+
+            return canvas.toDataURL('image/jpeg', 0.82);
+        }
+
+        async function loadPhotos() {
+            const response = await fetch(`${CONFIG.API_BASE_URL}/api/slideshow/${user.id}`);
+            const data = await response.json();
+            if (!response.ok) {
+                showStatus(data.error || 'Could not load photos.');
+                return;
+            }
+            if (!data.photos.length) {
+                photoGrid.innerHTML = '<p style="color:#666;">No shared photos yet. Upload your first one.</p>';
+                return;
+            }
+
+            photoGrid.innerHTML = data.photos.map((photo) => `
+                <div class="photo-card">
+                    <img class="photo" src="${photo.image_data}" alt="Shared memory">
+                    <div class="photo-caption">${escapeHtml(photo.caption || '')}</div>
+                    <div class="photo-actions">
+                        <button class="btn-delete" type="button" data-photo-id="${photo.id}">Delete</button>
+                    </div>
+                </div>
+            `).join('');
+
+            photoGrid.querySelectorAll('.btn-delete').forEach((button) => {
+                button.addEventListener('click', async () => {
+                    const photoId = Number(button.dataset.photoId);
+                    if (!photoId) return;
+
+                    const response = await fetch(`${CONFIG.API_BASE_URL}/api/slideshow/${photoId}`, {
+                        method: 'DELETE',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ userId: user.id })
+                    });
+                    const data = await response.json();
+                    if (!response.ok) {
+                        showStatus(data.error || 'Delete failed.');
+                        return;
+                    }
+
+                    showStatus('Photo deleted.');
+                    await loadPhotos();
+                });
+            });
+        }
+
+        document.getElementById('uploadBtn').addEventListener('click', async () => {
+            const file = document.getElementById('photoInput').files[0];
+            const caption = document.getElementById('captionInput').value.trim();
+            if (!file) {
+                showStatus('Please choose an image first.');
+                return;
+            }
+
+            if (!file.type.startsWith('image/')) {
+                showStatus('Only image files are allowed.');
+                return;
+            }
+
+            try {
+                showStatus('Preparing image...');
+                const imageData = await compressImageFile(file);
+
+                showStatus('Uploading...');
+                const response = await fetch(`${CONFIG.API_BASE_URL}/api/slideshow/upload`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ userId: user.id, imageData, caption })
+                });
+                const data = await response.json();
+                if (!response.ok) {
+                    showStatus(data.error || 'Upload failed.');
+                    return;
+                }
+
+                showStatus('Photo uploaded to shared slideshow.');
+                document.getElementById('photoInput').value = '';
+                document.getElementById('captionInput').value = '';
+                await loadPhotos();
+            } catch (err) {
+                showStatus(err.message || 'Upload failed. Please try again.');
+            }
+        });
+
+        (async function init() {
+            await loadPhotos();
+            if (slideshowPollTimer) clearInterval(slideshowPollTimer);
+            slideshowPollTimer = setInterval(loadPhotos, 5000);
+        })();
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Select Gender - Loveria</title>
+    <link rel="stylesheet" href="../auth/Auth.css">
+    <script src="../../utils/config.js"></script>
+    <style>
+        :root {
+            --primary: #ff5cc8;
+            --primary-light: #b46bff;
+            --glass: rgba(32, 15, 58, 0.72);
+        }
+
+        body {
+            background:
+                radial-gradient(circle at 12% 16%, rgba(255, 92, 200, 0.28) 0%, transparent 44%),
+                radial-gradient(circle at 85% 82%, rgba(121, 76, 255, 0.24) 0%, transparent 42%),
+                linear-gradient(145deg, #12031f 0%, #1b0834 55%, #271146 100%);
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 420px;
+            background: var(--glass);
+            border-radius: 22px;
+            border: 1px solid rgba(255, 170, 236, 0.28);
+            box-shadow: 0 16px 38px rgba(8, 3, 20, 0.48);
+            padding: 30px;
+            text-align: center;
+        }
+
+        h1 {
+            margin: 0 0 8px;
+            color: #ffd7f7;
+        }
+
+        .subtitle {
+            margin: 0 0 22px;
+            color: #d9c7f3;
+        }
+
+        .gender-options {
+            display: grid;
+            gap: 10px;
+        }
+
+        .gender-option {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px;
+            border-radius: 12px;
+            border: 2px solid rgba(255, 170, 236, 0.22);
+            background: rgba(255, 255, 255, 0.08);
+            color: #f6e8ff;
+            cursor: pointer;
+            font-weight: 700;
+            transition: all 0.2s ease;
+        }
+
+        .gender-option.active {
+            border-color: var(--primary);
+            background: rgba(255, 92, 200, 0.15);
+            color: #ffd4f6;
+        }
+
+        .radio-dot {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            border: 2px solid rgba(255, 170, 236, 0.45);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            transition: border-color 0.2s ease;
+        }
+
+        .radio-dot::after {
+            content: '';
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--primary);
+            transform: scale(0);
+            transition: transform 0.2s ease;
+        }
+
+        .gender-option.active .radio-dot {
+            border-color: var(--primary);
+        }
+
+        .gender-option.active .radio-dot::after {
+            transform: scale(1);
+        }
+
+        .loading-text {
+            margin-top: 16px;
+            color: #d9c7f3;
+            font-size: 0.9rem;
+            min-height: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>One More Step</h1>
+        <p class="subtitle">What is your gender?</p>
+
+        <div class="gender-options">
+            <button type="button" class="gender-option" data-gender="male">
+                <span>Male</span>
+                <span class="radio-dot" aria-hidden="true"></span>
+            </button>
+            <button type="button" class="gender-option" data-gender="female">
+                <span>Female</span>
+                <span class="radio-dot" aria-hidden="true"></span>
+            </button>
+            <button type="button" class="gender-option" data-gender="others">
+                <span>Others</span>
+                <span class="radio-dot" aria-hidden="true"></span>
+            </button>
+        </div>
+
+        <p id="loadingText" class="loading-text" aria-live="polite"></p>
+    </div>
+
+    <script>
+        const user = JSON.parse(localStorage.getItem('user'));
+        if (!user || !user.id) {
+            window.location.href = '../auth/Login.html';
+        }
+
+        let selectedGender = '';
+        let isSaving = false;
+        const options = document.querySelectorAll('.gender-option');
+        const loadingText = document.getElementById('loadingText');
+
+        async function saveGenderAndContinue() {
+            if (!selectedGender || isSaving) {
+                return;
+            }
+            isSaving = true;
+            loadingText.textContent = 'Saving your selection...';
+            options.forEach((opt) => {
+                opt.disabled = true;
+            });
+
+            const response = await fetch(`${CONFIG.API_BASE_URL}/api/user/gender`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    userId: user.id,
+                    gender: selectedGender
+                })
+            });
+            const data = await response.json();
+            if (!response.ok) {
+                alert(data.error || 'Failed to save gender.');
+                isSaving = false;
+                loadingText.textContent = '';
+                options.forEach((opt) => {
+                    opt.disabled = false;
+                });
+                return;
+            }
+
+            localStorage.setItem('user', JSON.stringify(data.user));
+            window.location.href = './Nickname.html';
+        }
+
+        options.forEach((option) => {
+            option.addEventListener('click', async () => {
+                if (isSaving) return;
+                selectedGender = option.dataset.gender;
+                options.forEach((opt) => opt.classList.remove('active'));
+                option.classList.add('active');
+                await saveGenderAndContinue();
+            });
+        });
+    </script>
+</body>
+
+</html>
