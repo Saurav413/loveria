@@ -4,327 +4,637 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Loveria - Our Story</title>
-    <link rel="stylesheet" href="features/auth/Auth.css">
+    <title>Loveria - Home</title>
     <style>
         :root {
             --primary: #ff5cc8;
             --primary-light: #ff90dd;
-            --bg: #1b083c;
-            --glass: rgba(39, 14, 76, 0.78);
+            --ink: #fde9ff;
+            --muted: #c9a8e8;
+            --panel: rgba(39, 14, 76, 0.55);
+            --line: rgba(255, 255, 255, 0.18);
         }
 
+        * { box-sizing: border-box; }
+
         body {
-            background: radial-gradient(circle at 14% 10%, #6e37eb 0%, #2a0f62 46%, #13042f 100%);
+            margin: 0;
             min-height: 100vh;
+            background: radial-gradient(ellipse at 20% 0%, #5a2bb5 0%, #2a0f62 42%, #13042f 100%);
+            font-family: Georgia, "Times New Roman", serif;
+            color: var(--ink);
+        }
+
+        a { color: inherit; text-decoration: none; }
+
+        .site-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            padding: 1.1rem 4vw;
+            border-bottom: 1px solid var(--line);
+            background: rgba(19, 4, 47, 0.45);
+            backdrop-filter: blur(12px);
+            position: sticky;
+            top: 0;
+            z-index: 20;
+        }
+
+        .brand {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--primary);
+            letter-spacing: -0.02em;
+        }
+
+        .nav {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 0.75rem 1.25rem;
+            font-family: system-ui, -apple-system, sans-serif;
+            font-size: 0.92rem;
+        }
+
+        .nav a {
+            color: var(--muted);
+            transition: color 0.2s ease;
+        }
+
+        .nav a:hover { color: #fff; }
+
+        .nav-btn {
+            border: 1px solid rgba(255, 255, 255, 0.35);
+            background: transparent;
+            color: #fff;
+            padding: 0.55rem 1rem;
+            border-radius: 8px;
+            font: inherit;
+            cursor: pointer;
+            transition: background 0.2s ease, border-color 0.2s ease;
+        }
+
+        .nav-btn:hover {
+            border-color: var(--primary-light);
+            color: var(--primary-light);
+        }
+
+        .page {
+            width: min(1120px, 92vw);
+            margin: 0 auto;
+            padding: 2.5rem 0 4rem;
+        }
+
+        .hero {
+            position: relative;
+            overflow: hidden;
+            border-radius: 20px;
+            border: 1px solid var(--line);
+            margin-bottom: 1.5rem;
+            min-height: 220px;
+            display: grid;
+            grid-template-columns: 1.4fr 1fr;
+            gap: 2rem;
+            align-items: end;
+            padding: 2rem 1.75rem;
+            background: rgba(19, 4, 47, 0.45);
+        }
+
+        .hero-bg {
+            position: absolute;
+            inset: 0;
+            background-size: cover;
+            background-position: center;
+            transform: scale(1.08);
+            filter: saturate(1.05) brightness(0.55);
+            opacity: 0;
+            transition: opacity 0.8s ease;
+            animation: heroDrift 18s ease-in-out infinite alternate;
+            pointer-events: none;
+        }
+
+        .hero-bg.has-image { opacity: 1; }
+
+        .hero::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(90deg, rgba(19, 4, 47, 0.88) 0%, rgba(19, 4, 47, 0.55) 55%, rgba(19, 4, 47, 0.35) 100%);
+            pointer-events: none;
+        }
+
+        .hero-copy,
+        .stat {
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-avatars {
+            display: flex;
+            align-items: center;
+            gap: 0;
+            margin-bottom: 1rem;
+        }
+
+        .avatar {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            border: 2px solid rgba(255, 255, 255, 0.85);
+            object-fit: cover;
+            background: linear-gradient(135deg, #7a3de0, #ff5cc8);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-family: 'Inter', system-ui, -apple-system, sans-serif;
-            margin: 0;
-            padding: 20px;
-            color: #fde9ff;
-        }
-
-        .dashboard-container {
-            background: var(--glass);
-            backdrop-filter: blur(15px);
-            padding: 40px;
-            border-radius: 32px;
-            box-shadow: 0 20px 50px rgba(8, 3, 20, 0.5);
-            width: 100%;
-            max-width: 450px;
-            text-align: center;
-            border: 1px solid rgba(255, 255, 255, 0.5);
-            animation: slideUp 0.8s ease-out;
-        }
-
-        @keyframes slideUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .heart-icon {
-            font-size: 4rem;
-            margin-bottom: 20px;
-            display: inline-block;
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0% {
-                transform: scale(1);
-            }
-
-            50% {
-                transform: scale(1.1);
-            }
-
-            100% {
-                transform: scale(1);
-            }
-        }
-
-        h1 {
-            color: var(--primary);
-            font-size: 2.2rem;
-            margin: 0 0 10px 0;
-            font-weight: 800;
-        }
-
-        .nicknames {
-            font-size: 1.2rem;
-            color: #e9d0ff;
-            margin-bottom: 30px;
-            font-style: italic;
-        }
-
-        .counter-card {
-            background: linear-gradient(135deg, rgba(35, 14, 67, 0.92) 0%, rgba(53, 24, 96, 0.92) 100%);
-            padding: 30px;
-            border-radius: 20px;
-            box-shadow: 0 12px 26px rgba(8, 3, 20, 0.4);
-            border: 1px solid rgba(255, 175, 236, 0.34);
-            margin-bottom: 30px;
-        }
-
-        .slideshow-card {
-            background: linear-gradient(135deg, rgba(255, 98, 204, 0.3) 0%, rgba(130, 93, 255, 0.28) 100%);
-            border-radius: 20px;
-            box-shadow: 0 14px 30px rgba(8, 3, 20, 0.35), 0 0 0 1px rgba(255, 255, 255, 0.08) inset;
-            margin-bottom: 20px;
+            font-family: system-ui, -apple-system, sans-serif;
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: #fff;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
             overflow: hidden;
-            border: 1px solid rgba(255, 176, 237, 0.42);
-            padding: 8px;
-            backdrop-filter: blur(8px);
+            flex-shrink: 0;
         }
 
-        .slideshow-image {
+        .avatar + .avatar {
+            margin-left: -12px;
+        }
+
+        .avatar img {
             width: 100%;
-            aspect-ratio: 16 / 9;
-            height: auto;
-            max-height: 320px;
-            box-sizing: border-box;
-            padding: 8px;
-            border-radius: 14px;
-            object-fit: contain;
-            display: none;
-            background: linear-gradient(135deg, #2a0f62 0%, #13042f 100%);
-            border: 2px solid rgba(255, 255, 255, 0.92);
-            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18);
-            opacity: 1;
-            transition: opacity 0.6s ease;
+            height: 100%;
+            object-fit: cover;
+            display: block;
         }
 
-        .slideshow-image.fading {
-            opacity: 0.15;
+        .hero-copy h1 {
+            margin: 0 0 0.5rem;
+            font-size: clamp(2.4rem, 5vw, 3.6rem);
+            color: var(--primary);
+            line-height: 1.05;
         }
 
-        .slideshow-placeholder {
-            padding: 22px;
-            color: #f2d8ff;
-            font-size: 0.95rem;
+        .hero-copy p {
+            margin: 0;
+            font-family: system-ui, -apple-system, sans-serif;
+            font-size: 1.15rem;
+            color: var(--muted);
         }
 
-        .slideshow-caption {
-            padding: 10px 14px 14px;
-            color: #f1d6ff;
-            font-size: 0.9rem;
-            text-align: left;
-            min-height: 18px;
+        .stat {
+            text-align: right;
         }
 
         .days-number {
-            font-size: 4.5rem;
-            font-weight: 900;
-            color: #ff78d4;
-            text-shadow: 0 0 20px rgba(255, 120, 212, 0.28);
-            line-height: 1;
-            margin-bottom: 5px;
+            font-size: clamp(3.5rem, 8vw, 5.5rem);
+            font-weight: 700;
+            color: var(--primary);
+            line-height: 0.95;
         }
 
         .days-label {
+            margin-top: 0.4rem;
+            font-family: system-ui, -apple-system, sans-serif;
             text-transform: uppercase;
-            letter-spacing: 2px;
-            font-size: 0.9rem;
-            color: #f2deff;
-            font-weight: 600;
+            letter-spacing: 0.18em;
+            font-size: 0.78rem;
+            color: var(--muted);
         }
 
-        .distance-card {
-            background: linear-gradient(135deg, rgba(35, 14, 67, 0.92) 0%, rgba(53, 24, 96, 0.92) 100%);
-            padding: 18px;
-            border-radius: 20px;
-            box-shadow: 0 12px 26px rgba(8, 3, 20, 0.4);
-            border: 1px solid rgba(255, 175, 236, 0.34);
-            margin-bottom: 24px;
-            text-align: left;
+        .cinema-section {
+            margin-bottom: 1.5rem;
         }
 
-        .distance-title {
-            color: #b987ff;
-            font-weight: 700;
-            margin-bottom: 8px;
-            font-size: 1rem;
+        .cinema-section .panel {
+            padding: 1.1rem 1.15rem 1.2rem;
         }
 
-        .distance-main {
-            color: #f7e8ff;
-            font-weight: 800;
-            font-size: 1.2rem;
-            margin-bottom: 8px;
+        .cinema-head {
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            gap: 1rem;
+            margin-bottom: 0.75rem;
         }
 
-        .distance-line {
-            color: #dcc0ff;
-            font-size: 0.88rem;
-            margin: 4px 0;
-            word-break: break-word;
+        .cinema-head h2 {
+            margin: 0;
         }
 
-        .menu-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
+        .cinema-link {
+            font-family: system-ui, -apple-system, sans-serif;
+            font-size: 0.85rem;
+            color: var(--primary-light);
         }
 
-        .menu-item {
-            background: rgba(255, 255, 255, 0.12);
-            padding: 20px;
-            border-radius: 16px;
-            text-decoration: none;
-            color: #f7e8ff;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            border: 1px solid transparent;
+        .cinema-stage {
+            position: relative;
+            overflow: hidden;
+            border-radius: 14px;
+            border: 1px solid var(--line);
+            background: rgba(19, 4, 47, 0.55);
+            aspect-ratio: 21 / 9;
+            min-height: 260px;
+            max-height: 420px;
         }
 
-        .menu-item:hover {
-            background: rgba(255, 255, 255, 0.25);
-            transform: translateY(-3px);
-            border-color: var(--primary-light);
-            color: var(--primary);
+        .cinema-slide {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            transition: opacity 1.1s ease;
+            pointer-events: none;
         }
 
-        .logout-btn {
-            margin-top: 30px;
-            background: none;
-            border: none;
-            color: #888;
-            cursor: pointer;
-            font-size: 0.9rem;
-            text-decoration: underline;
+        .cinema-slide.is-active {
+            opacity: 1;
+            z-index: 1;
         }
 
-        .logout-btn:hover {
-            color: var(--primary);
+        .cinema-slide img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            transform-origin: center center;
         }
 
-        #loading {
-            position: fixed;
-            top: 0;
+        .cinema-slide.is-active img.kb-a {
+            animation: kenBurnsA 6.5s ease-in-out infinite alternate;
+        }
+
+        .cinema-slide.is-active img.kb-b {
+            animation: kenBurnsB 6.5s ease-in-out infinite alternate;
+        }
+
+        .cinema-slide.is-active img.kb-c {
+            animation: kenBurnsC 6.5s ease-in-out infinite alternate;
+        }
+
+        @keyframes kenBurnsA {
+            from { transform: scale(1) translate(0, 0); }
+            to { transform: scale(1.14) translate(-2.5%, -1.5%); }
+        }
+
+        @keyframes kenBurnsB {
+            from { transform: scale(1.12) translate(-2%, 1%); }
+            to { transform: scale(1) translate(1%, -1%); }
+        }
+
+        @keyframes kenBurnsC {
+            from { transform: scale(1) translate(1%, 0); }
+            to { transform: scale(1.16) translate(0, -2%); }
+        }
+
+        @keyframes heroDrift {
+            from { transform: scale(1.08) translate(0, 0); }
+            to { transform: scale(1.16) translate(-1.5%, 1%); }
+        }
+
+        .cinema-vignette {
+            position: absolute;
+            inset: 0;
+            z-index: 2;
+            background: linear-gradient(180deg, transparent 45%, rgba(12, 2, 28, 0.82) 100%);
+            pointer-events: none;
+        }
+
+        .cinema-meta {
+            position: absolute;
             left: 0;
             right: 0;
             bottom: 0;
-            background: white;
+            z-index: 3;
+            padding: 1.1rem 1.2rem 1rem;
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            gap: 1rem;
+        }
+
+        .cinema-caption {
+            margin: 0;
+            font-family: system-ui, -apple-system, sans-serif;
+            color: #fff;
+            font-size: 0.98rem;
+            font-weight: 500;
+            text-shadow: 0 2px 12px rgba(0, 0, 0, 0.45);
+            max-width: 70%;
+        }
+
+        .cinema-dots {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+            max-width: 40%;
+        }
+
+        .cinema-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.35);
+            transition: transform 0.2s ease, background 0.2s ease;
+        }
+
+        .cinema-dot.is-active {
+            background: #fff;
+            transform: scale(1.25);
+        }
+
+        .cinema-placeholder {
+            position: absolute;
+            inset: 0;
             display: flex;
             align-items: center;
             justify-content: center;
-            z-index: 1000;
+            padding: 2rem 1.5rem;
+            text-align: center;
+            font-family: system-ui, -apple-system, sans-serif;
+            color: var(--muted);
+            font-size: 0.95rem;
+            line-height: 1.5;
+            z-index: 4;
+        }
+
+        .cinema-placeholder[hidden] { display: none; }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.25rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .panel {
+            background: var(--panel);
+            border: 1px solid var(--line);
+            border-radius: 16px;
+            padding: 1.35rem 1.4rem;
+            backdrop-filter: blur(10px);
+        }
+
+        .panel h2 {
+            margin: 0 0 0.75rem;
+            font-size: 1.35rem;
+            color: var(--primary-light);
+            font-weight: 600;
+        }
+
+        .info-main {
+            font-family: system-ui, -apple-system, sans-serif;
+            font-size: 1.15rem;
+            font-weight: 600;
+            margin-bottom: 0.65rem;
+        }
+
+        .info-line {
+            font-family: system-ui, -apple-system, sans-serif;
+            color: var(--muted);
+            font-size: 0.9rem;
+            margin: 0.3rem 0;
+            word-break: break-word;
+        }
+
+        .section-title {
+            margin: 0 0 1rem;
             font-size: 1.5rem;
-            color: var(--primary);
+            color: #fff;
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+        }
+
+        .feature {
+            display: flex;
+            flex-direction: column;
+            gap: 0.55rem;
+            min-height: 120px;
+            padding: 1.25rem;
+            border-radius: 14px;
+            border: 1px solid var(--line);
+            background: rgba(255, 255, 255, 0.08);
+            font-family: system-ui, -apple-system, sans-serif;
+            transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+        }
+
+        .feature:hover {
+            transform: translateY(-3px);
+            border-color: var(--primary-light);
+            background: rgba(255, 255, 255, 0.12);
+        }
+
+        .feature strong {
+            font-size: 1.05rem;
+            color: #fff;
+        }
+
+        .feature span {
+            color: var(--muted);
+            font-size: 0.88rem;
+            line-height: 1.4;
+        }
+
+        .site-footer {
+            width: min(1120px, 92vw);
+            margin: 0 auto;
+            padding: 1.5rem 0 2.5rem;
+            border-top: 1px solid var(--line);
+            font-family: system-ui, -apple-system, sans-serif;
+            color: var(--muted);
+            font-size: 0.88rem;
+            display: flex;
+            justify-content: space-between;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .site-footer a { color: var(--primary-light); }
+
+        #homeRoot { display: none; }
+
+        #loading {
+            position: fixed;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: radial-gradient(ellipse at 20% 0%, #5a2bb5 0%, #2a0f62 42%, #13042f 100%);
+            z-index: 1000;
+            font-family: system-ui, -apple-system, sans-serif;
+            color: var(--primary-light);
+        }
+
+        #loading.is-hidden { display: none !important; }
+
+        @media (max-width: 900px) {
+            .hero,
+            .features {
+                grid-template-columns: 1fr;
+            }
+
+            .stat { text-align: left; }
+
+            .cinema-stage {
+                aspect-ratio: 4 / 3;
+                max-height: none;
+            }
+
+            .cinema-caption { max-width: 100%; }
+            .cinema-dots { max-width: 100%; }
         }
     </style>
 </head>
 
 <body>
-    <div id="loading">✨ Creating Magic...</div>
+    <div id="loading">Loading...</div>
 
-    <div class="dashboard-container">
-        <div class="heart-icon">💖</div>
-        <h1 id="welcome-msg">Our Journey</h1>
-        <div class="nicknames" id="nicknames-display">Loading...</div>
+    <div id="homeRoot">
+        <header class="site-header">
+            <a class="brand" href="index.html">Loveria</a>
+            <nav class="nav">
+                <a href="features/reminders/ReminderSetup.html">Reminders</a>
+                <a href="features/drawing/SharedDrawing.html">Drawing</a>
+                <a href="features/memories/SharedSlideshow.html">Slideshow</a>
+                <a href="features/onboarding/Pairing.html">Pairing</a>
+                <button class="nav-btn" type="button" onclick="logout()">Log out</button>
+            </nav>
+        </header>
 
-        <div class="counter-card">
-            <div class="days-number" id="days-count">0</div>
-            <div class="days-label">Days of Love</div>
-        </div>
+        <main class="page">
+            <section class="hero">
+                <div class="hero-bg" id="heroCoupleBg" aria-hidden="true"></div>
+                <div class="hero-copy">
+                    <div class="hero-avatars" id="heroAvatars" aria-hidden="true">
+                        <div class="avatar" id="selfAvatar"></div>
+                        <div class="avatar" id="partnerAvatar"></div>
+                    </div>
+                    <h1>Our Journey</h1>
+                    <p id="nicknames-display">Loading...</p>
+                </div>
+                <div class="stat">
+                    <div class="days-number" id="days-count">0</div>
+                    <div class="days-label">Days of Love</div>
+                </div>
+            </section>
 
-        <div class="distance-card">
-            <div class="distance-title">Our Distance</div>
-            <div id="distanceMain" class="distance-main">Detecting locations...</div>
-            <div id="selfLocationLine" class="distance-line">Your location: --</div>
-            <div id="partnerLocationLine" class="distance-line">Partner location: --</div>
-        </div>
+            <section class="cinema-section">
+                <article class="panel">
+                    <div class="cinema-head">
+                        <h2>Shared Memories</h2>
+                        <a class="cinema-link" href="features/memories/SharedSlideshow.html">Add photos →</a>
+                    </div>
+                    <div class="cinema-stage" id="cinemaStage">
+                        <div id="cinemaSlides"></div>
+                        <div class="cinema-vignette" aria-hidden="true"></div>
+                        <div class="cinema-meta">
+                            <p class="cinema-caption" id="cinemaCaption"></p>
+                            <div class="cinema-dots" id="cinemaDots"></div>
+                        </div>
+                        <div class="cinema-placeholder" id="cinemaPlaceholder">
+                            No photos yet. Add a couple photo or upload shared memories to start your cinematic flow.
+                        </div>
+                    </div>
+                </article>
+            </section>
 
-        <div class="slideshow-card">
-            <img id="sharedSlideshowImage" class="slideshow-image" alt="Shared memory slideshow">
-            <div id="slideshowPlaceholder" class="slideshow-placeholder">
-                No shared slideshow photos yet. Add photos from Shared Slideshow.
-            </div>
-            <div id="slideshowCaption" class="slideshow-caption"></div>
-        </div>
+            <section class="grid-2">
+                <article class="panel">
+                    <h2>Our Distance</h2>
+                    <div id="distanceMain" class="info-main">Detecting locations...</div>
+                    <div id="selfLocationLine" class="info-line">Your location: --</div>
+                    <div id="partnerLocationLine" class="info-line">Partner location: --</div>
+                </article>
+            </section>
 
-        <div class="menu-grid">
-            <a href="features/countdown/index.html" class="menu-item">
-                <span>⏳</span><br>Countdown
-            </a>
-            <a href="features/memories/index.html" class="menu-item">
-                <span>📸</span><br>Memories
-            </a>
-            <a href="features/chat/index.html" class="menu-item">
-                <span>💬</span><br>Secret Chat
-            </a>
-            <a href="features/timezone/index.html" class="menu-item">
-                <span>🌎</span><br>Timezone
-            </a>
-            <a href="features/reminders/ReminderSetup.html" class="menu-item">
-                <span>🗓️</span><br>Reminders
-            </a>
-            <a href="features/drawing/SharedDrawing.html" class="menu-item">
-                <span>✍️</span><br>Live Drawing
-            </a>
-            <a href="features/memories/SharedSlideshow.html" class="menu-item">
-                <span>🖼️</span><br>Shared Slideshow
-            </a>
-        </div>
+            <h2 class="section-title">Explore</h2>
+            <section class="features">
+                <a class="feature" href="features/reminders/ReminderSetup.html">
+                    <strong>Reminders</strong>
+                    <span>Save dates and notes that matter to both of you.</span>
+                </a>
+                <a class="feature" href="features/drawing/SharedDrawing.html">
+                    <strong>Live Drawing</strong>
+                    <span>Sketch together on a shared canvas.</span>
+                </a>
+                <a class="feature" href="features/memories/SharedSlideshow.html">
+                    <strong>Shared Slideshow</strong>
+                    <span>Upload and replay your favorite moments.</span>
+                </a>
+                <a class="feature" href="features/onboarding/Pairing.html">
+                    <strong>Pairing</strong>
+                    <span>Connect accounts with a pairing code.</span>
+                </a>
+            </section>
+        </main>
 
-        <button class="logout-btn" onclick="logout()">Logout</button>
+        <footer class="site-footer">
+            <span>Loveria</span>
+            <span>Need to pair? <a href="features/onboarding/Pairing.html">Open pairing</a></span>
+        </footer>
     </div>
 
     <script src="utils/config.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', async () => {
-            const user = JSON.parse(localStorage.getItem('user'));
+        function showHome() {
+            const loading = document.getElementById('loading');
+            const home = document.getElementById('homeRoot');
+            if (loading) {
+                loading.classList.add('is-hidden');
+                loading.style.display = 'none';
+            }
+            if (home) home.style.display = 'block';
+        }
 
-            // 1. Check Authentication
-            if (!user || !user.id) {
+        function readStoredUser() {
+            try {
+                const raw = localStorage.getItem('user');
+                if (!raw) return null;
+                const parsed = JSON.parse(raw);
+                return parsed && parsed.id ? parsed : null;
+            } catch (err) {
+                return null;
+            }
+        }
+
+        function hasSkippedPairing() {
+            return localStorage.getItem('pairingSkipped') === 'true'
+                || new URLSearchParams(window.location.search).get('skipped') === '1';
+        }
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            const user = readStoredUser();
+
+            if (!user) {
                 window.location.href = 'features/auth/Login.html';
                 return;
             }
 
-            // 2. Refresh user from DB so UI always reflects saved data.
+            if (new URLSearchParams(window.location.search).get('skipped') === '1') {
+                localStorage.setItem('pairingSkipped', 'true');
+            }
+
             let dbUser = user;
             try {
-                const response = await fetch(`${CONFIG.API_BASE_URL}/api/user/${user.id}`);
+                const controller = new AbortController();
+                const timeout = setTimeout(() => controller.abort(), 4000);
+                const response = await fetch(`${CONFIG.API_BASE_URL}/api/user/${user.id}`, {
+                    signal: controller.signal
+                });
+                clearTimeout(timeout);
                 const data = await response.json();
                 if (response.ok && data.user) {
                     dbUser = data.user;
                     localStorage.setItem('user', JSON.stringify(dbUser));
                 }
             } catch (err) {
-                // Fall back to local storage when offline/API unavailable.
                 console.warn('Could not refresh user from DB:', err);
             }
 
-            // 3. Check onboarding status
             if (!dbUser.gender) {
                 window.location.href = 'features/onboarding/GenderSelection.html';
                 return;
@@ -340,16 +650,20 @@
                 return;
             }
 
-            if (!dbUser.partner_user_id) {
+            if (!dbUser.partner_user_id && !hasSkippedPairing()) {
                 window.location.href = 'features/onboarding/Pairing.html';
                 return;
             }
 
-            // 4. Display Data
-            document.getElementById('loading').style.display = 'none';
+            if (dbUser.partner_user_id) {
+                localStorage.removeItem('pairingSkipped');
+            } else {
+                localStorage.setItem('pairingSkipped', 'true');
+            }
+
+            showHome();
             document.getElementById('nicknames-display').innerText = `${dbUser.nickname} & ${dbUser.partner_nickname}`;
 
-            // 5. Calculate Days
             const calcDays = () => {
                 const startDate = new Date(dbUser.relationship_date);
                 const today = new Date();
@@ -357,98 +671,249 @@
                 const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
                 document.getElementById('days-count').innerText = diffDays;
             };
-
             calcDays();
 
-            const slideshowImage = document.getElementById('sharedSlideshowImage');
-            const slideshowPlaceholder = document.getElementById('slideshowPlaceholder');
-            const slideshowCaption = document.getElementById('slideshowCaption');
-            const SLIDESHOW_INTERVAL_MS = 3000;
-            let slideshowPhotos = [];
-            let slideshowIndex = 0;
-            let isAnimating = false;
-            let slideshowRefreshTimer = null;
-            let slideshowTickTimer = null;
+            const cinemaSlidesEl = document.getElementById('cinemaSlides');
+            const cinemaPlaceholder = document.getElementById('cinemaPlaceholder');
+            const cinemaCaption = document.getElementById('cinemaCaption');
+            const cinemaDots = document.getElementById('cinemaDots');
+            const heroCoupleBg = document.getElementById('heroCoupleBg');
+            const selfAvatar = document.getElementById('selfAvatar');
+            const partnerAvatar = document.getElementById('partnerAvatar');
+            const CINEMA_INTERVAL_MS = 6500;
+            const KB_CLASSES = ['kb-a', 'kb-b', 'kb-c'];
+            let cinemaPhotos = [];
+            let cinemaIndex = 0;
+            let cinemaRefreshTimer = null;
+            let cinemaTickTimer = null;
             let serverTimeOffsetMs = 0;
             let locationRefreshTimer = null;
+            let lastCinemaSignature = '';
 
-            const renderSlideshow = () => {
-                if (!slideshowPhotos.length) {
-                    slideshowImage.style.display = 'none';
-                    slideshowPlaceholder.style.display = 'block';
-                    slideshowCaption.textContent = '';
+            const initialFrom = (name) => {
+                const text = String(name || '').trim();
+                return text ? text.charAt(0).toUpperCase() : '?';
+            };
+
+            const setAvatar = (el, imageData, fallbackName) => {
+                el.innerHTML = '';
+                if (imageData) {
+                    const img = document.createElement('img');
+                    img.src = imageData;
+                    img.alt = fallbackName || 'Profile';
+                    el.appendChild(img);
+                } else {
+                    el.textContent = initialFrom(fallbackName);
+                }
+            };
+
+            const fetchJsonSafe = async (url) => {
+                try {
+                    const response = await fetch(url);
+                    const data = await response.json().catch(() => ({}));
+                    return { ok: response.ok, data, response };
+                } catch (err) {
+                    return { ok: false, data: {}, response: null };
+                }
+            };
+
+            const buildCinemaReel = (slideshowPhotos, couplePhotos) => {
+                const reel = [];
+                const seen = new Set();
+
+                const pushPhoto = (imageData, caption, createdAt, id) => {
+                    if (!imageData || seen.has(imageData)) return;
+                    seen.add(imageData);
+                    reel.push({
+                        id: id || `local-${reel.length}`,
+                        image_data: imageData,
+                        caption: caption || '',
+                        created_at: createdAt || new Date(0).toISOString()
+                    });
+                };
+
+                couplePhotos.forEach((photo, idx) => {
+                    pushPhoto(photo.image_data, photo.caption || 'Us', photo.created_at, `couple-${photo.id || idx}`);
+                });
+
+                slideshowPhotos.forEach((photo) => {
+                    pushPhoto(photo.image_data, photo.caption || '', photo.created_at, `slide-${photo.id}`);
+                });
+
+                return reel;
+            };
+
+            const renderCinemaFrame = () => {
+                if (!cinemaPhotos.length) {
+                    cinemaSlidesEl.innerHTML = '';
+                    cinemaDots.innerHTML = '';
+                    cinemaCaption.textContent = '';
+                    cinemaPlaceholder.hidden = false;
                     return;
                 }
-                slideshowPlaceholder.style.display = 'none';
-                slideshowImage.style.display = 'block';
-                slideshowCaption.textContent = slideshowPhotos[slideshowIndex].caption || '';
 
-                if (!slideshowImage.src) {
-                    slideshowImage.src = slideshowPhotos[slideshowIndex].image_data;
+                cinemaPlaceholder.hidden = true;
+                const slides = cinemaSlidesEl.querySelectorAll('.cinema-slide');
+                slides.forEach((slide, idx) => {
+                    const img = slide.querySelector('img');
+                    const active = idx === cinemaIndex;
+                    slide.classList.toggle('is-active', active);
+                    if (img) {
+                        img.classList.remove(...KB_CLASSES);
+                        if (active) {
+                            img.classList.add(KB_CLASSES[idx % KB_CLASSES.length]);
+                        }
+                    }
+                });
+
+                cinemaCaption.textContent = cinemaPhotos[cinemaIndex].caption || 'A moment together';
+                cinemaDots.querySelectorAll('.cinema-dot').forEach((dot, idx) => {
+                    dot.classList.toggle('is-active', idx === cinemaIndex);
+                });
+            };
+
+            const mountCinemaSlides = () => {
+                const signature = cinemaPhotos.map((p) => `${p.id}:${(p.caption || '').length}`).join('|');
+                if (signature === lastCinemaSignature && cinemaSlidesEl.children.length === cinemaPhotos.length) {
+                    renderCinemaFrame();
                     return;
                 }
+                lastCinemaSignature = signature;
+                cinemaSlidesEl.innerHTML = '';
+                cinemaDots.innerHTML = '';
 
-                if (isAnimating) return;
-                isAnimating = true;
-                slideshowImage.classList.add('fading');
-                setTimeout(() => {
-                    slideshowImage.src = slideshowPhotos[slideshowIndex].image_data;
-                    slideshowImage.classList.remove('fading');
-                    isAnimating = false;
-                }, 280);
+                cinemaPhotos.forEach((photo, idx) => {
+                    const slide = document.createElement('div');
+                    slide.className = 'cinema-slide';
+                    const img = document.createElement('img');
+                    img.src = photo.image_data;
+                    img.alt = photo.caption || 'Shared memory';
+                    img.loading = idx === 0 ? 'eager' : 'lazy';
+                    slide.appendChild(img);
+                    cinemaSlidesEl.appendChild(slide);
+
+                    const dot = document.createElement('span');
+                    dot.className = 'cinema-dot';
+                    cinemaDots.appendChild(dot);
+                });
+
+                renderCinemaFrame();
             };
 
             const getServerNowMs = () => Date.now() + serverTimeOffsetMs;
 
             const getSynchronizedIndex = () => {
-                if (!slideshowPhotos.length) return 0;
-                const anchorMs = Date.parse(slideshowPhotos[0].created_at) || 0;
+                if (!cinemaPhotos.length) return 0;
+                const anchorMs = Date.parse(cinemaPhotos[0].created_at) || 0;
                 const elapsedMs = Math.max(getServerNowMs() - anchorMs, 0);
-                return Math.floor(elapsedMs / SLIDESHOW_INTERVAL_MS) % slideshowPhotos.length;
+                return Math.floor(elapsedMs / CINEMA_INTERVAL_MS) % cinemaPhotos.length;
             };
 
             const startSynchronizedTicker = () => {
-                if (slideshowTickTimer) clearInterval(slideshowTickTimer);
-                slideshowTickTimer = setInterval(() => {
-                    if (!slideshowPhotos.length) return;
+                if (cinemaTickTimer) clearInterval(cinemaTickTimer);
+                cinemaTickTimer = setInterval(() => {
+                    if (!cinemaPhotos.length) return;
                     const nextIndex = getSynchronizedIndex();
-                    if (nextIndex !== slideshowIndex) {
-                        slideshowIndex = nextIndex;
-                        renderSlideshow();
+                    if (nextIndex !== cinemaIndex) {
+                        cinemaIndex = nextIndex;
+                        renderCinemaFrame();
                     }
-                }, 500);
+                }, 400);
             };
 
-            const refreshSlideshow = async () => {
-                const response = await fetch(`${CONFIG.API_BASE_URL}/api/slideshow/${dbUser.id}`);
-                const data = await response.json();
-                const serverDateHeader = response.headers.get('date');
-                if (serverDateHeader) {
-                    const serverNow = Date.parse(serverDateHeader);
-                    if (!Number.isNaN(serverNow)) {
-                        serverTimeOffsetMs = serverNow - Date.now();
+            const refreshPersonalPhotos = async () => {
+                const partnerId = dbUser.partner_user_id ? Number(dbUser.partner_user_id) : null;
+                const [selfProfile, partnerProfile, selfCouple, partnerCouple] = await Promise.all([
+                    fetchJsonSafe(`${CONFIG.API_BASE_URL}/api/user/profile-picture/${dbUser.id}`),
+                    partnerId
+                        ? fetchJsonSafe(`${CONFIG.API_BASE_URL}/api/user/profile-picture/${partnerId}`)
+                        : Promise.resolve({ ok: false, data: {} }),
+                    fetchJsonSafe(`${CONFIG.API_BASE_URL}/api/couple-photo/${dbUser.id}`),
+                    partnerId
+                        ? fetchJsonSafe(`${CONFIG.API_BASE_URL}/api/couple-photo/${partnerId}`)
+                        : Promise.resolve({ ok: false, data: {} })
+                ]);
+
+                setAvatar(
+                    selfAvatar,
+                    selfProfile.ok ? selfProfile.data.photo?.image_data : null,
+                    dbUser.nickname
+                );
+                setAvatar(
+                    partnerAvatar,
+                    partnerProfile.ok ? partnerProfile.data.photo?.image_data : null,
+                    dbUser.partner_nickname
+                );
+
+                const couplePhotos = [];
+                if (selfCouple.ok && selfCouple.data.photo?.image_data) {
+                    couplePhotos.push({
+                        ...selfCouple.data.photo,
+                        caption: 'Us',
+                        created_at: selfCouple.data.photo.created_at || '1970-01-01T00:00:00Z'
+                    });
+                    heroCoupleBg.style.backgroundImage = `url(${JSON.stringify(selfCouple.data.photo.image_data)})`;
+                    heroCoupleBg.classList.add('has-image');
+                } else if (partnerCouple.ok && partnerCouple.data.photo?.image_data) {
+                    couplePhotos.push({
+                        ...partnerCouple.data.photo,
+                        caption: 'Us',
+                        created_at: partnerCouple.data.photo.created_at || '1970-01-01T00:00:00Z'
+                    });
+                    heroCoupleBg.style.backgroundImage = `url(${JSON.stringify(partnerCouple.data.photo.image_data)})`;
+                    heroCoupleBg.classList.add('has-image');
+                } else {
+                    heroCoupleBg.classList.remove('has-image');
+                    heroCoupleBg.style.backgroundImage = '';
+                }
+
+                if (
+                    partnerCouple.ok
+                    && partnerCouple.data.photo?.image_data
+                    && selfCouple.ok
+                    && selfCouple.data.photo?.image_data
+                    && partnerCouple.data.photo.image_data !== selfCouple.data.photo.image_data
+                ) {
+                    couplePhotos.push({
+                        ...partnerCouple.data.photo,
+                        caption: 'Us',
+                        created_at: partnerCouple.data.photo.created_at || '1970-01-01T00:00:01Z'
+                    });
+                }
+
+                return couplePhotos;
+            };
+
+            const refreshCinema = async () => {
+                const [slideshowResult, couplePhotos] = await Promise.all([
+                    fetchJsonSafe(`${CONFIG.API_BASE_URL}/api/slideshow/${dbUser.id}`),
+                    refreshPersonalPhotos()
+                ]);
+
+                if (slideshowResult.response) {
+                    const serverDateHeader = slideshowResult.response.headers.get('date');
+                    if (serverDateHeader) {
+                        const serverNow = Date.parse(serverDateHeader);
+                        if (!Number.isNaN(serverNow)) {
+                            serverTimeOffsetMs = serverNow - Date.now();
+                        }
                     }
                 }
 
-                if (response.ok && Array.isArray(data.photos)) {
-                    slideshowPhotos = [...data.photos].sort((a, b) => {
+                let slideshowPhotos = [];
+                if (slideshowResult.ok && Array.isArray(slideshowResult.data.photos)) {
+                    slideshowPhotos = [...slideshowResult.data.photos].sort((a, b) => {
                         const timeA = Date.parse(a.created_at) || 0;
                         const timeB = Date.parse(b.created_at) || 0;
                         if (timeA !== timeB) return timeA - timeB;
                         return Number(a.id) - Number(b.id);
                     });
-                    if (!slideshowPhotos.length) {
-                        slideshowIndex = 0;
-                    } else {
-                        slideshowIndex = getSynchronizedIndex();
-                    }
-                    renderSlideshow();
-                    startSynchronizedTicker();
-                } else {
-                    slideshowPhotos = [];
-                    slideshowIndex = 0;
-                    renderSlideshow();
                 }
+
+                cinemaPhotos = buildCinemaReel(slideshowPhotos, couplePhotos);
+                cinemaIndex = cinemaPhotos.length ? getSynchronizedIndex() : 0;
+                mountCinemaSlides();
+                startSynchronizedTicker();
             };
 
             const distanceMain = document.getElementById('distanceMain');
@@ -526,13 +991,11 @@
             };
 
             try {
-                await refreshSlideshow();
-                if (slideshowRefreshTimer) {
-                    clearInterval(slideshowRefreshTimer);
-                }
-                slideshowRefreshTimer = setInterval(refreshSlideshow, 5000);
+                await refreshCinema();
+                if (cinemaRefreshTimer) clearInterval(cinemaRefreshTimer);
+                cinemaRefreshTimer = setInterval(refreshCinema, 8000);
             } catch (err) {
-                renderSlideshow();
+                mountCinemaSlides();
             }
 
             await captureAndSyncLocation();
@@ -542,7 +1005,8 @@
 
         function logout() {
             localStorage.removeItem('user');
-            window.location.href = 'features/auth/Login.html';
+            localStorage.removeItem('pairingSkipped');
+            window.location.href = '../landing.html';
         }
     </script>
 </body>

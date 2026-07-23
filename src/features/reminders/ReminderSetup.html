@@ -165,12 +165,12 @@
                 const data = await response.json();
                 if (response.ok && data.user) {
                     localStorage.setItem('user', JSON.stringify(data.user));
-                    if (!data.user.partner_user_id) {
+                    if (!data.user.partner_user_id && localStorage.getItem('pairingSkipped') !== 'true') {
                         window.location.href = '../onboarding/Pairing.html';
                     }
                 }
             } catch (err) {
-                if (!user.partner_user_id) {
+                if (!user.partner_user_id && localStorage.getItem('pairingSkipped') !== 'true') {
                     window.location.href = '../onboarding/Pairing.html';
                 }
             }

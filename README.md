@@ -1,50 +1,68 @@
-# Loveria — couple companion web app
+# Loveria — couple companion website
 
-**Loveria** is a full-stack web app for couples: sign up, log in, and personalize a shared space with nicknames, a “together since” date, optional calendar reminders with notes, and an optional couple photo stored in the database.
+**Loveria** is a website for couples: sign up, log in, and personalize a shared space with nicknames, a “together since” date, optional calendar reminders with notes, and an optional couple photo stored in the database.
 
 ## Tech stack
 
-- **Backend:** Node.js, Express, REST APIs  
-- **Database:** MySQL (`mysql2`), with tables created at startup (`users`, `reminders`, `couple_photos`)  
-- **Auth:** Email/password with **bcrypt** hashing  
-- **Frontend:** Static HTML/CSS/JS served by Express; API base URL in `src/utils/config.js`  
-- **Mobile:** Capacitor (`android/`, `ios/`) to wrap the web UI  
-- **Config:** `.env` via **dotenv** — copy `.env.example` to `.env` and set DB credentials  
+- **Backend:** PHP (procedural), `mysqli` with prepared statements  
+- **Database:** MySQL  
+- **Auth:** Google sign-in + email OTP  
+- **Email:** Gmail SMTP via **PHPMailer** (Composer)  
+- **Frontend:** HTML, CSS, vanilla JavaScript  
+- **Server:** Apache via **XAMPP** (or PHP’s built-in server)  
 
 ## Features
 
-- User registration and login backed by MySQL  
-- Onboarding: partner nicknames and relationship start date  
-- Reminders: pick a date, add a note, persist in DB; browser notifications when due (with permission)  
-- Couple photo upload after reminders; image stored in MySQL  
-- Dashboard home with links to reminders and other areas  
+- Google registration/login with OTP emailed via PHPMailer  
+- Onboarding: gender, partner nicknames, relationship start date, pairing codes  
+- Reminders: pick a date, add a note, persist in DB; browser notifications when due  
+- Couple / profile photo upload; images stored in MySQL  
+- Shared drawing (save + live sync via short polling) and shared slideshow  
+- Partner location distance on the home page  
 
-## Run locally
+## Run locally (XAMPP)
+
+1. Start **Apache** and **MySQL** in the XAMPP control panel.  
+2. Place/clone this project at:
+   `/Applications/XAMPP/xamppfiles/htdocs/loveria`
+3. Install PHP dependencies:
+   ```bash
+   cd /Applications/XAMPP/xamppfiles/htdocs/loveria
+   /Applications/XAMPP/xamppfiles/bin/php composer.phar install
+   ```
+4. Copy env and edit credentials:
+   ```bash
+   cp .env.example .env
+   ```
+   Set `DB_*`, `GOOGLE_CLIENT_ID`, and SMTP (`SMTP_USER` / `SMTP_PASS` Gmail app password).  
+5. Open: **http://localhost/loveria/**  
+
+### PHP built-in server (optional)
 
 ```bash
-cd /path/to/loveria
-npm install
-cp .env.example .env   # edit DB_HOST, DB_USER, DB_PASSWORD, DB_NAME, PORT
-npm run start
+cd /Applications/XAMPP/xamppfiles/htdocs/loveria
+/Applications/XAMPP/xamppfiles/bin/php -S localhost:8080 router.php
 ```
 
-Open `http://localhost:3000/` (redirects to signup). Ensure MySQL is running (e.g. XAMPP).
+Then open `http://localhost:8080/`.
 
 ## Folder structure
 
-- `server.js` — Express app, static files, MySQL pool, API routes  
-- `src/` — frontend  
+- `landing.html` — public landing / login entry  
+- `api/index.php` — PHP front controller (REST API)  
+- `config/config.php` — loads `.env` + defaults  
+- `includes/` — db schema, helpers, PHPMailer wrapper  
+- `src/` — website pages  
   - `features/auth/` — Login, Signup  
-  - `features/onboarding/` — Nicknames, date selection, couple photo  
+  - `features/onboarding/` — Nicknames, date, pairing, photos  
   - `features/reminders/` — Reminder setup  
+  - `features/drawing/`, `features/memories/` — shared canvas & slideshow  
   - `utils/config.js` — `API_BASE_URL` for fetch calls  
-- `android/`, `ios/` — Capacitor native projects  
-- `public/`, `docs/`, `tests/` — placeholders / extras  
 
 ## Git notes
 
-- `node_modules/` and `.env` are ignored — run `npm install` and create `.env` after clone.
+- `vendor/` and `.env` are ignored — run `composer install` and create `.env` after clone.
 
 ## One-line summary
 
-> Express + MySQL couple app with auth, onboarding, date reminders, and optional couple photo upload; Capacitor-ready static frontend.
+> PHP + MySQL couple website with Google OTP auth, onboarding, reminders, shared drawing/slideshow, and couple photo upload; served by Apache/XAMPP.

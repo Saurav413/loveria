@@ -1,0 +1,11 @@
+{
+    "name": "loveria/website",
+    "description": "Loveria couple companion website — PHP + MySQL (XAMPP)",
+    "require": {
+        "php": ">=8.0",
+        "phpmailer/phpmailer": "^6.9"
+    },
+    "autoload": {
+        "files": []
+    }
+}

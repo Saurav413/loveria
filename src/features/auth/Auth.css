@@ -144,7 +144,8 @@ p.subtitle {
     border: none;
     border-radius: 12px;
     color: #333;
-    font-weight: 600;
+    font-size: 1rem;
+    font-weight: 700;
     cursor: pointer;
     transition: background 0.2s ease;
 }
@@ -154,8 +155,10 @@ p.subtitle {
 }
 
 .social-btn.apple {
-    background: linear-gradient(135deg, #ff4db8, #8f5bff);
+    background: linear-gradient(90deg, #f04bb2 0%, #8a5dff 100%);
     color: #fff;
+    font-size: 1rem;
+    font-weight: 700;
 }
 
 .social-btn.google img {

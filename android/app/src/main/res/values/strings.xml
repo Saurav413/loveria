@@ -1,7 +1,0 @@
-<?xml version='1.0' encoding='utf-8'?>
-<resources>
-    <string name="app_name">Loveria</string>
-    <string name="title_activity_main">Loveria</string>
-    <string name="package_name">com.loveria.app</string>
-    <string name="custom_url_scheme">com.loveria.app</string>
-</resources>

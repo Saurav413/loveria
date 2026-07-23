@@ -1,7 +1,20 @@
 const isBrowserHttp = typeof window !== 'undefined' && /^https?:\/\//.test(window.location.origin);
 
+function resolveApiBaseUrl() {
+    if (!isBrowserHttp) {
+        return 'http://localhost/loveria';
+    }
+
+    const { origin, pathname } = window.location;
+    // XAMPP: http://localhost/loveria/...
+    const loveriaMatch = pathname.match(/^(.*?\/loveria)(?:\/|$)/);
+    if (loveriaMatch) {
+        return origin + loveriaMatch[1];
+    }
+
+    return origin;
+}
+
 const CONFIG = {
-    // Default to same origin for web (e.g. http://localhost:3000).
-    // Fallback keeps local dev working if loaded from non-http context.
-    API_BASE_URL: isBrowserHttp ? window.location.origin : 'http://localhost:3000'
+    API_BASE_URL: resolveApiBaseUrl()
 };

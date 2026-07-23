@@ -1,5 +1,8 @@
 node_modules/
+vendor/
+composer.phar
 .env
 .DS_Store
 *.log
 database.sqlite
+

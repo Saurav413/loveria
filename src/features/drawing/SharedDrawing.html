@@ -7,7 +7,6 @@
     <title>Shared Drawing - Loveria</title>
     <link rel="stylesheet" href="../auth/Auth.css">
     <script src="../../utils/config.js"></script>
-    <script src="/socket.io/socket.io.js"></script>
     <style>
         :root {
             --primary: #ff5cc8;
@@ -146,11 +145,11 @@
         const partnerCtx = partnerCanvas.getContext('2d');
         const saveStatus = document.getElementById('saveStatus');
         const partnerStatus = document.getElementById('partnerStatus');
-        const socket = io(CONFIG.API_BASE_URL);
         let isDrawing = false;
         let isDirty = false;
         let lastX = 0;
         let lastY = 0;
+        let lastEventId = 0;
 
         function showSaveStatus(message) {
             saveStatus.textContent = message;
@@ -189,10 +188,59 @@
                 lineWidth: 4
             };
             drawStroke(ctx, stroke);
-            socket.emit('drawing-stroke', { stroke });
+            postStroke(stroke);
             lastX = point.x;
             lastY = point.y;
             isDirty = true;
+        }
+
+        async function postStroke(stroke) {
+            try {
+                await fetch(`${CONFIG.API_BASE_URL}/api/drawing/stroke`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ userId: user.id, stroke })
+                });
+            } catch (err) {
+                console.warn('Failed to sync stroke:', err);
+            }
+        }
+
+        async function postClear() {
+            try {
+                await fetch(`${CONFIG.API_BASE_URL}/api/drawing/clear`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ userId: user.id })
+                });
+            } catch (err) {
+                console.warn('Failed to sync clear:', err);
+            }
+        }
+
+        async function pollPartnerEvents() {
+            try {
+                const response = await fetch(
+                    `${CONFIG.API_BASE_URL}/api/drawing/events/${user.id}?since=${lastEventId}`
+                );
+                const data = await response.json();
+                if (!response.ok) {
+                    partnerStatus.textContent = data.error || 'Realtime sync unavailable.';
+                    return;
+                }
+                for (const event of data.events || []) {
+                    lastEventId = Math.max(lastEventId, Number(event.id) || 0);
+                    if (event.event_type === 'clear') {
+                        partnerCtx.clearRect(0, 0, partnerCanvas.width, partnerCanvas.height);
+                        partnerStatus.textContent = 'Partner cleared the canvas.';
+                    } else if (event.event_type === 'stroke' && event.stroke) {
+                        drawStroke(partnerCtx, event.stroke);
+                        partnerStatus.textContent = `Live update: ${new Date().toLocaleTimeString()}`;
+                    }
+                }
+            } catch (err) {
+                partnerStatus.textContent = 'Waiting for partner drawing...';
+            }
         }
 
         function drawStroke(targetCtx, stroke) {
@@ -273,7 +321,7 @@
         document.getElementById('saveBtn').addEventListener('click', saveDrawing);
         document.getElementById('clearBtn').addEventListener('click', () => {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            socket.emit('drawing-clear');
+            postClear();
             saveDrawing();
         });
 
@@ -283,28 +331,11 @@
         canvas.addEventListener('pointerleave', endDraw);
         canvas.addEventListener('pointercancel', endDraw);
 
-        socket.on('connect', () => {
-            socket.emit('join-pair-room', { userId: user.id });
-        });
-
-        socket.on('drawing-stroke', ({ stroke }) => {
-            drawStroke(partnerCtx, stroke);
-            partnerStatus.textContent = `Live update: ${new Date().toLocaleTimeString()}`;
-        });
-
-        socket.on('drawing-clear', () => {
-            partnerCtx.clearRect(0, 0, partnerCanvas.width, partnerCanvas.height);
-            partnerStatus.textContent = 'Partner cleared the canvas.';
-        });
-
-        socket.on('drawing-error', ({ message }) => {
-            partnerStatus.textContent = message || 'Realtime sync unavailable.';
-        });
-
         (async function init() {
             await loadSelfDrawing();
             await loadPartnerDrawing();
             setInterval(loadPartnerDrawing, 2500);
+            setInterval(pollPartnerEvents, 400);
         })();
     </script>
 </body>

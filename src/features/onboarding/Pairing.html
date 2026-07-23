@@ -99,7 +99,7 @@
             color: #333;
         }
 
-        .code-box {
+            .code-box {
             background: #fff5f8;
             border: 1px dashed #ff9fb2;
             border-radius: 12px;
@@ -111,6 +111,26 @@
             font-weight: 800;
             letter-spacing: 4px;
             display: none;
+        }
+
+        .skip-wrap {
+            margin-top: 8px;
+            text-align: center;
+        }
+
+        .skip-link {
+            background: none;
+            border: none;
+            color: var(--primary-light);
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: underline;
+            padding: 8px;
+        }
+
+        .skip-link:hover {
+            color: #fff;
         }
     </style>
 </head>
@@ -132,6 +152,10 @@
             <p style="margin: 0 0 8px; color:#666; font-size:0.92rem;">Share this code with your partner so they can connect to you.</p>
             <button id="createCodeBtn" class="btn btn-secondary" type="button">Create My Pairing Code</button>
             <div id="codeBox" class="code-box"></div>
+        </div>
+
+        <div class="skip-wrap">
+            <button id="skipPairingBtn" class="skip-link" type="button">Skip for now</button>
         </div>
 
     </div>
@@ -191,7 +215,13 @@
             if (data.user) {
                 localStorage.setItem('user', JSON.stringify(data.user));
             }
+            localStorage.removeItem('pairingSkipped');
             window.location.href = '../../index.html';
+        });
+
+        document.getElementById('skipPairingBtn').addEventListener('click', () => {
+            localStorage.setItem('pairingSkipped', 'true');
+            window.location.href = '../../index.html?skipped=1';
         });
 
         document.getElementById('createCodeBtn').addEventListener('click', async () => {
