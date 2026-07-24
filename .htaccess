@@ -4,4 +4,4 @@ RewriteBase /loveria/
 # Route all /api/* requests to the PHP front controller
 RewriteRule ^api(?:/(.*))?$ api/index.php [QSA,L]
 
-DirectoryIndex index.php index.html
+DirectoryIndex xampp-index.php index.html landing.html
