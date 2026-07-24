@@ -40,7 +40,7 @@ export default function CouplePhotoPage() {
       setStatus(result.data.error || "Upload failed.");
       return;
     }
-    router.push("/pairing");
+    router.push("/home");
   };
 
   return (
@@ -64,7 +64,7 @@ export default function CouplePhotoPage() {
         )}
         <div style={{ display: "flex", gap: "0.5rem", marginTop: "1rem" }}>
           <button className="btn" type="button" onClick={upload}>Save</button>
-          <button className="btn btn-ghost" type="button" onClick={() => router.push("/pairing")}>Skip</button>
+          <button className="btn btn-ghost" type="button" onClick={() => router.push("/home")}>Skip</button>
         </div>
         {status && <p className="muted">{status}</p>}
       </div>

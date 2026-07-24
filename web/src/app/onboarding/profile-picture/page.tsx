@@ -17,10 +17,27 @@ export default function ProfilePicturePage() {
   const router = useRouter();
   const [preview, setPreview] = useState("");
   const [status, setStatus] = useState("");
+  const [pairedFlow, setPairedFlow] = useState(false);
 
   useEffect(() => {
-    if (!readStoredUser()) router.replace("/login");
+    const user = readStoredUser();
+    if (!user) {
+      router.replace("/login");
+      return;
+    }
+    const paired =
+      Boolean(user.partner_user_id) || localStorage.getItem("pairedJustNow") === "1";
+    setPairedFlow(paired);
   }, [router]);
+
+  const finish = () => {
+    localStorage.removeItem("pairedJustNow");
+    if (pairedFlow || readStoredUser()?.partner_user_id) {
+      router.push("/home");
+    } else {
+      router.push("/onboarding/couple-photo");
+    }
+  };
 
   const upload = async () => {
     const user = readStoredUser();
@@ -40,14 +57,18 @@ export default function ProfilePicturePage() {
       setStatus(result.data.error || "Upload failed.");
       return;
     }
-    router.push("/onboarding/couple-photo");
+    finish();
   };
 
   return (
     <main className="page-shell" style={{ maxWidth: 480, paddingTop: "3rem" }}>
       <div className="glass-card">
         <h1 style={{ color: "var(--primary)", marginTop: 0 }}>Profile Picture</h1>
-        <p className="muted">Upload a photo to personalize your Loveria profile.</p>
+        <p className="muted">
+          {pairedFlow
+            ? "You're paired — just add a profile photo to finish."
+            : "Upload a photo to personalize your Loveria profile."}
+        </p>
         <input
           id="photo"
           type="file"
@@ -60,11 +81,25 @@ export default function ProfilePicturePage() {
         />
         {preview && (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={preview} alt="Preview" style={{ width: 120, height: 120, borderRadius: "50%", objectFit: "cover", marginTop: 12 }} />
+          <img
+            src={preview}
+            alt="Preview"
+            style={{
+              width: 120,
+              height: 120,
+              borderRadius: "50%",
+              objectFit: "cover",
+              marginTop: 12,
+            }}
+          />
         )}
         <div style={{ display: "flex", gap: "0.5rem", marginTop: "1rem" }}>
-          <button className="btn" type="button" onClick={upload}>Save</button>
-          <button className="btn btn-ghost" type="button" onClick={() => router.push("/onboarding/couple-photo")}>Skip</button>
+          <button className="btn" type="button" onClick={upload}>
+            Save
+          </button>
+          <button className="btn btn-ghost" type="button" onClick={finish}>
+            Skip
+          </button>
         </div>
         {status && <p className="muted">{status}</p>}
       </div>

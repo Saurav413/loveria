@@ -7,6 +7,7 @@ import {
   api,
   clearAuth,
   hasSkippedPairing,
+  nextOnboardingPath,
   readStoredUser,
   saveUser,
   type LoveriaUser,
@@ -38,12 +39,13 @@ export default function HomePage() {
       const dbUser = refreshed.ok && refreshed.data.user ? refreshed.data.user : stored;
       saveUser(dbUser);
 
-      if (!dbUser.gender) return router.replace("/onboarding/gender");
-      if (!dbUser.nickname || !dbUser.partner_nickname) return router.replace("/onboarding/nicknames");
-      if (!dbUser.relationship_date) return router.replace("/onboarding/date");
-      if (!dbUser.partner_user_id && !hasSkippedPairing()) return router.replace("/pairing");
+      const path = nextOnboardingPath(dbUser);
+      if (path !== "/home") {
+        router.replace(path);
+        return;
+      }
       if (dbUser.partner_user_id) localStorage.removeItem("pairingSkipped");
-      else localStorage.setItem("pairingSkipped", "true");
+      else if (hasSkippedPairing()) localStorage.setItem("pairingSkipped", "true");
 
       setUser(dbUser);
       if (dbUser.relationship_date) {

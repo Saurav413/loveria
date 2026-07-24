@@ -1,6 +1,11 @@
 import { prisma } from "@/lib/prisma";
 import { json, mapUser, readJson } from "@/lib/http";
 
+function nicknameFromEmail(email: string) {
+  const local = email.split("@")[0] || "Love";
+  return local.slice(0, 24);
+}
+
 export async function POST(request: Request) {
   const body = await readJson<{ userId?: number; code?: string }>(request);
   const userId = Number(body.userId || 0);
@@ -17,14 +22,34 @@ export async function POST(request: Request) {
       if (pair.ownerUserId === userId) throw new Error("OWN");
 
       const ownerId = pair.ownerUserId;
+      const owner = await tx.user.findUnique({ where: { id: ownerId } });
+      const joiner = await tx.user.findUnique({ where: { id: userId } });
+      if (!owner || !joiner) throw new Error("NOT_FOUND");
+
       await tx.user.update({
         where: { id: ownerId },
-        data: { partnerUserId: userId },
+        data: {
+          partnerUserId: userId,
+          // If owner is missing partner nickname, use joiner's name when available
+          partnerNickname:
+            owner.partnerNickname ||
+            joiner.nickname ||
+            nicknameFromEmail(joiner.email),
+        },
       });
+
+      // Joiner inherits shared journey fields from the partner — only profile photo left.
       const updated = await tx.user.update({
         where: { id: userId },
-        data: { partnerUserId: ownerId },
+        data: {
+          partnerUserId: ownerId,
+          gender: joiner.gender || owner.gender || "others",
+          nickname: joiner.nickname || nicknameFromEmail(joiner.email),
+          partnerNickname: joiner.partnerNickname || owner.nickname || "Partner",
+          relationshipDate: joiner.relationshipDate || owner.relationshipDate,
+        },
       });
+
       await tx.pairingCode.update({
         where: { id: pair.id },
         data: {
@@ -39,6 +64,7 @@ export async function POST(request: Request) {
     return json({
       message: "Connected with your partner successfully.",
       user: mapUser(user),
+      pairedOnboarding: true,
     });
   } catch (err) {
     const message = (err as Error).message;
