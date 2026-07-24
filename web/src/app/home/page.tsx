@@ -210,7 +210,7 @@ export default function HomePage() {
             { href: "/reminders", title: "Reminders", text: "Save dates and notes that matter to both of you." },
             { href: "/drawing", title: "Live Drawing", text: "Sketch together on a shared canvas." },
             { href: "/slideshow", title: "Shared Slideshow", text: "Upload photos that become your page backgrounds." },
-            { href: "/pairing", title: "Pairing", text: "Connect accounts with a pairing code." },
+            { href: "/pairing", title: "Pairing", text: "Connect or unpair with a pairing code." },
           ].map((f) => (
             <Link key={f.href} href={f.href} className="feature">
               <strong>{f.title}</strong>
