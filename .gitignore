@@ -2,6 +2,8 @@ node_modules/
 vendor/
 composer.phar
 .env
+web/.env
+web/.env.local
 .DS_Store
 *.log
 database.sqlite
