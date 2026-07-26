@@ -358,6 +358,131 @@ body.has-cinematic-bg > *:not(.loveria-cinematic-bg) { position: relative; z-ind
   min-height: 100% !important;
 }
 
+/* Feature cinematic intros */
+.feature-landing {
+  min-height: 100vh;
+  width: min(1120px, 92vw);
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 1.5rem 0 3.5rem;
+  position: relative;
+  z-index: 1;
+}
+
+.feature-landing-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.feature-landing-brand {
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+.feature-landing-back {
+  font-family: system-ui, -apple-system, sans-serif;
+  font-size: 0.9rem;
+  color: var(--muted);
+  opacity: 0;
+}
+
+.feature-landing-back:hover {
+  color: #fff;
+}
+
+.feature-landing-hero {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  max-width: 34rem;
+  padding-bottom: 1.5rem;
+}
+
+.feature-landing-eyebrow {
+  margin: 0 0 0.65rem;
+  font-family: system-ui, -apple-system, sans-serif;
+  font-size: 0.78rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--primary-light);
+  opacity: 0;
+  transform: translateY(16px);
+}
+
+.feature-landing-title {
+  margin: 0;
+  font-size: clamp(2.8rem, 8vw, 4.6rem);
+  line-height: 0.98;
+  color: var(--primary);
+  opacity: 0;
+  transform: translateY(22px);
+}
+
+.feature-landing-line {
+  margin: 1rem 0 0;
+  max-width: 28rem;
+  font-size: 1.05rem;
+  line-height: 1.5;
+  opacity: 0;
+  transform: translateY(18px);
+  animation: none;
+}
+
+.feature-landing-actions {
+  margin-top: 1.75rem;
+  opacity: 0;
+  transform: translateY(16px);
+}
+
+.feature-landing-cta {
+  min-width: 11rem;
+}
+
+.feature-landing.is-ready .feature-landing-brand {
+  animation: featureEnter 0.85s ease forwards;
+}
+
+.feature-landing.is-ready .feature-landing-back {
+  animation: featureEnter 0.85s ease 0.08s forwards;
+}
+
+.feature-landing.is-ready .feature-landing-eyebrow {
+  animation: featureEnter 0.9s ease 0.12s forwards;
+}
+
+.feature-landing.is-ready .feature-landing-title {
+  animation: featureEnter 1s ease 0.22s forwards;
+}
+
+.feature-landing.is-ready .feature-landing-line {
+  animation: featureEnter 1s ease 0.34s forwards, featureDrift 7s ease-in-out 1.4s infinite alternate;
+}
+
+.feature-landing.is-ready .feature-landing-actions {
+  animation: featureEnter 0.95s ease 0.48s forwards;
+}
+
+@keyframes featureEnter {
+  from {
+    opacity: 0;
+    transform: translateY(22px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes featureDrift {
+  from { transform: translateY(0); }
+  to { transform: translateY(-4px); }
+}
+
 @media (max-width: 900px) {
   .home-hero,
   .home-grid,
@@ -365,4 +490,13 @@ body.has-cinematic-bg > *:not(.loveria-cinematic-bg) { position: relative; z-ind
     grid-template-columns: 1fr;
   }
   .home-hero > div:last-child { text-align: left !important; }
+
+  .feature-landing {
+    padding-bottom: 2.5rem;
+  }
+
+  .feature-landing-hero {
+    justify-content: center;
+    padding-bottom: 0;
+  }
 }
