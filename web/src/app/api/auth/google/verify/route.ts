@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { json, mapUser, readJson } from "@/lib/http";
-import { hashSecret, verifySecret } from "@/lib/auth";
+import { hashSecret, issueTrustedDevice, verifySecret } from "@/lib/auth";
 
 export async function POST(request: Request) {
   const body = await readJson<{ verificationId?: string; code?: string }>(request);
@@ -41,8 +41,14 @@ export async function POST(request: Request) {
     });
   }
 
+  const deviceToken = await issueTrustedDevice(
+    verification.email,
+    verification.googleSub
+  );
+
   return json({
     message: "Google sign-in successful.",
     user: mapUser(user),
+    deviceToken,
   });
 }

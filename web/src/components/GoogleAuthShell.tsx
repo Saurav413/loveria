@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, type ReactNode, type RefObject } from "react";
 import { useRouter } from "next/navigation";
-import { api, nextOnboardingPath, saveUser, type LoveriaUser } from "@/lib/client";
+import { api, nextOnboardingPath, readDeviceToken, saveDeviceToken, saveUser, type LoveriaUser } from "@/lib/client";
 
 declare global {
   interface Window {
@@ -92,18 +92,34 @@ function useGoogleAuth() {
     });
   }, []);
 
+  const finishLogin = (user: LoveriaUser, deviceToken?: string) => {
+    saveUser(user);
+    if (deviceToken) saveDeviceToken(deviceToken);
+    router.push(nextOnboardingPath(user));
+  };
+
   const onCredential = async (credential: string) => {
-    setStatus("Sending verification code...");
+    setStatus("Signing in...");
     const start = await api<{
       error?: string;
       verificationId?: string;
       email?: string;
+      user?: LoveriaUser;
+      deviceToken?: string;
+      skippedOtp?: boolean;
     }>("/api/auth/google/start", {
       method: "POST",
-      body: JSON.stringify({ credential }),
+      body: JSON.stringify({
+        credential,
+        deviceToken: readDeviceToken() || undefined,
+      }),
     });
     if (!start.ok) {
       setStatus(start.data.error || "Could not start Google sign-in.");
+      return;
+    }
+    if (start.data.skippedOtp && start.data.user) {
+      finishLogin(start.data.user, start.data.deviceToken);
       return;
     }
     setVerificationId(start.data.verificationId || null);
@@ -119,19 +135,19 @@ function useGoogleAuth() {
       return;
     }
     setStatus("Verifying...");
-    const result = await api<{ error?: string; user?: LoveriaUser }>(
-      "/api/auth/google/verify",
-      {
-        method: "POST",
-        body: JSON.stringify({ verificationId, code }),
-      }
-    );
+    const result = await api<{
+      error?: string;
+      user?: LoveriaUser;
+      deviceToken?: string;
+    }>("/api/auth/google/verify", {
+      method: "POST",
+      body: JSON.stringify({ verificationId, code }),
+    });
     if (!result.ok || !result.data.user) {
       setStatus(result.data.error || "Invalid code.");
       return;
     }
-    saveUser(result.data.user);
-    router.push(nextOnboardingPath(result.data.user));
+    finishLogin(result.data.user, result.data.deviceToken);
   };
 
   const otpUi =

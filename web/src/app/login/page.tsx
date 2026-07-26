@@ -1,11 +1,42 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { GoogleAuthShell } from "@/components/GoogleAuthShell";
+import { resumeSession } from "@/lib/client";
 
 export default function LoginPage() {
   const router = useRouter();
+  const [checking, setChecking] = useState(true);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const session = await resumeSession();
+      if (cancelled) return;
+      if (session) {
+        router.replace(session.path);
+        return;
+      }
+      setChecking(false);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [router]);
+
+  if (checking) {
+    return (
+      <main className="page-shell" style={{ maxWidth: 460, paddingTop: "4rem" }}>
+        <div className="glass-card">
+          <p className="muted" style={{ margin: 0, textAlign: "center" }}>
+            Welcome back — signing you in…
+          </p>
+        </div>
+      </main>
+    );
+  }
 
   return (
     <main className="page-shell" style={{ maxWidth: 460, paddingTop: "4rem" }}>
