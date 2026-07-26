@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { readStoredUser } from "@/lib/client";
@@ -16,7 +16,6 @@ type Props = {
 
 export function FeatureLanding({ title, eyebrow, line, ctaHref, ctaLabel }: Props) {
   const router = useRouter();
-  const [ready, setReady] = useState(false);
 
   useEffect(() => {
     const user = readStoredUser();
@@ -24,11 +23,12 @@ export function FeatureLanding({ title, eyebrow, line, ctaHref, ctaLabel }: Prop
       router.replace("/login");
       return;
     }
-    LoveriaCinematicBg.start({ userId: user.id }).finally(() => setReady(true));
+    // Don't block the hero on photo loading — text must stay visible.
+    void LoveriaCinematicBg.start({ userId: user.id });
   }, [router]);
 
   return (
-    <main className={`feature-landing ${ready ? "is-ready" : ""}`}>
+    <main className="feature-landing is-ready">
       <div className="feature-landing-top">
         <Link className="brand feature-landing-brand" href="/home">
           Loveria

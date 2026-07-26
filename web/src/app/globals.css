@@ -368,7 +368,7 @@ body.has-cinematic-bg > *:not(.loveria-cinematic-bg) { position: relative; z-ind
   justify-content: space-between;
   padding: 1.5rem 0 3.5rem;
   position: relative;
-  z-index: 1;
+  z-index: 2;
 }
 
 .feature-landing-top {
@@ -379,15 +379,14 @@ body.has-cinematic-bg > *:not(.loveria-cinematic-bg) { position: relative; z-ind
 }
 
 .feature-landing-brand {
-  opacity: 0;
-  transform: translateY(10px);
+  text-shadow: 0 2px 24px rgba(10, 2, 24, 0.55);
 }
 
 .feature-landing-back {
   font-family: system-ui, -apple-system, sans-serif;
   font-size: 0.9rem;
   color: var(--muted);
-  opacity: 0;
+  text-shadow: 0 1px 12px rgba(10, 2, 24, 0.6);
 }
 
 .feature-landing-back:hover {
@@ -410,6 +409,7 @@ body.has-cinematic-bg > *:not(.loveria-cinematic-bg) { position: relative; z-ind
   letter-spacing: 0.22em;
   text-transform: uppercase;
   color: var(--primary-light);
+  text-shadow: 0 1px 16px rgba(10, 2, 24, 0.65);
   opacity: 0;
   transform: translateY(16px);
 }
@@ -418,7 +418,8 @@ body.has-cinematic-bg > *:not(.loveria-cinematic-bg) { position: relative; z-ind
   margin: 0;
   font-size: clamp(2.8rem, 8vw, 4.6rem);
   line-height: 0.98;
-  color: var(--primary);
+  color: #ff7ad4;
+  text-shadow: 0 4px 32px rgba(10, 2, 24, 0.7);
   opacity: 0;
   transform: translateY(22px);
 }
@@ -428,9 +429,10 @@ body.has-cinematic-bg > *:not(.loveria-cinematic-bg) { position: relative; z-ind
   max-width: 28rem;
   font-size: 1.05rem;
   line-height: 1.5;
+  color: #f3e0ff !important;
+  text-shadow: 0 2px 18px rgba(10, 2, 24, 0.75);
   opacity: 0;
   transform: translateY(18px);
-  animation: none;
 }
 
 .feature-landing-actions {
@@ -441,6 +443,7 @@ body.has-cinematic-bg > *:not(.loveria-cinematic-bg) { position: relative; z-ind
 
 .feature-landing-cta {
   min-width: 11rem;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.35);
 }
 
 .feature-landing.is-ready .feature-landing-brand {
